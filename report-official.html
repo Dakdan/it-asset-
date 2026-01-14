@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>รายงานการสำรวจครุภัณฑ์</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+  font-family:"TH Sarabun New",sans-serif;
+  margin:2cm;
+  color:#000;
+}
+.header{
+  text-align:center;
+}
+.header img{
+  width:90px;
+}
+h1{font-size:22pt;margin:10px 0}
+h2{font-size:18pt;margin:5px 0}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:20px;
+  font-size:14pt;
+}
+th,td{
+  border:1px solid #000;
+  padding:6px;
+}
+.footer{
+  margin-top:40px;
+  text-align:right;
+}
+@media print{
+  button{display:none}
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/9/9f/Garuda_Emblem_of_Thailand.svg">
+  <h1>รายงานผลการสำรวจครุภัณฑ์คอมพิวเตอร์</h1>
+  <h2>โรงพยาบาลอุดรธานี</h2>
+</div>
+
+<table id="tb">
+<tr>
+  <th>ลำดับ</th>
+  <th>รหัสครุภัณฑ์</th>
+  <th>รายการ</th>
+  <th>หน่วยงาน</th>
+</tr>
+</table>
+
+<div class="footer">
+  ลงชื่อ..............................................<br>
+  (...................................................)<br>
+  ตำแหน่ง............................................
+</div>
+
+<button onclick="window.print()">พิมพ์</button>
+
+<script>
+const API="https://script.google.com/macros/s/AKfycbwj8TX_Lwv_oRLd3CtFL7ORBSu4CyweKfdoxF5vi-7UBqPeml6EBNmCCLDJ7qmsKqjD/exec";
+
+fetch(API+"?action=report")
+.then(r=>r.json())
+.then(d=>{
+  d.forEach((r,i)=>{
+    tb.innerHTML+=`
+      <tr>
+        <td>${i+1}</td>
+        <td>${r[1]}</td>
+        <td>${r[2]}</td>
+        <td>${r[3]}</td>
+      </tr>`;
+  });
+});
+</script>
+
+</body>
+</html>
