@@ -1,38 +1,23 @@
 <!DOCTYPE html>
 <html>
-<body onload="load()">
-<h2>ADMIN</h2>
-<table border="1">
-<thead>
-<tr><th>Email</th><th>Dept</th><th>Role</th></tr>
-</thead>
-<tbody id="tb"></tbody>
-</table>
-
+<head>
+<meta charset="utf-8">
+<title>ADMIN</title>
 <script src="config.js"></script>
-<script>
-requireLogin();
-if(getSession().role!=="ADMIN") alert("No permission");
+</head>
+<body>
 
-function load(){
-  const s=document.createElement("script");
-  s.src=GAS_API+"?action=adminUsers&callback=cb";
-  document.body.appendChild(s);
-}
-function cb(list){
-  tb.innerHTML="";
-  list.forEach(u=>{
-    tb.innerHTML+=
-      `<tr><td>${u.email}</td><td>${u.dept}</td><td>${u.role}</td></tr>`;
-  });
-}
+<h2>ADMIN PANEL</h2>
+<div id="out"></div>
+
+<script>
+const u = JSON.parse(sessionStorage.getItem("user"));
+if(!u || u.role!=="ADMIN") location.href="index.html";
+
+fetch(GAS_API + "?action=departments")
+.then(r=>r.json())
+.then(d=>out.innerHTML = d.join("<br>"));
 </script>
+
 </body>
 </html>
-<link rel="manifest" href="manifest.json">
-<script>
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("service-worker.js");
-}
-</script>
-
