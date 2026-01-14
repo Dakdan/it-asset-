@@ -1,15 +1,13 @@
 {
-  "name": "ระบบสำรวจครุภัณฑ์",
-  "short_name": "AssetSurvey",
+  "name": "IT Asset",
+  "short_name": "ITAsset",
   "start_url": "index.html",
   "display": "standalone",
-  "theme_color": "#ff69b4",
   "background_color": "#ffffff",
-  "icons": [
-    {
-      "src": "icon.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    }
-  ]
+  "theme_color": "#1976d2",
+  "icons": [{
+    "src": "icon.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  }]
 }
