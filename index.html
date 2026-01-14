@@ -1,23 +1,138 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>ระบบสำรวจครุภัณฑ์</title>
+<meta charset="UTF-8">
+<title>ระบบส่งข้อมูล และไฟล์งาน</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- PWA -->
-  <link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest.json">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<style>
+body{font-family:Prompt,sans-serif;margin:0;background:#fff0f5}
+header{background:#ffb6c1;border-bottom:3px solid #000;padding:10px;display:flex;gap:15px;align-items:center}
+header img{height:60px}
+.card{border:2px solid #000;border-radius:16px;padding:20px;margin:20px;background:#fff}
+input,select{width:100%;padding:8px;margin:6px 0;border:2px solid #000;border-radius:8px}
+button{background:#ff69b4;color:#fff;border:none;padding:10px 16px;border-radius:10px;margin-top:10px}
+table{width:100%;border-collapse:collapse}
+td,th{border:1px solid #000;padding:6px}
+.highlight{background:yellow}
+.hidden{display:none}
+</style>
 </head>
+
 <body>
 
-  <h1>ระบบสำรวจครุภัณฑ์คอมพิวเตอร์</h1>
-  <p>โรงพยาบาลอุดรธานี</p>
+<header>
+<img src="https://img2.pic.in.th/pic/ink.png">
+<div>
+<b>โรงพยาบาลอุดรธานี</b><br>
+กลุ่มงาน: เทคโนโลยีสารสนเทศคอมพิวเตอร์<br>
+โทร 1125,1126,1485
+</div>
+</header>
 
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js");
-    }
-  </script>
+<!-- REGISTER -->
+<div class="card" id="registerCard">
+<h3>ลงทะเบียนเพื่อเข้าใช้งาน</h3>
+<input id="r_email" placeholder="Email">
+<input id="r_name" placeholder="ชื่อ-สกุล">
+<input id="r_user" placeholder="Username">
+<input id="r_pass" type="password" placeholder="Password">
+<input id="r_dept" placeholder="หน่วยงาน">
+<button onclick="register()">ลงทะเบียน</button>
+</div>
+
+<!-- SURVEY -->
+<div class="card hidden" id="surveyCard">
+<h3>สำรวจครุภัณฑ์</h3>
+<b id="deptName"></b>
+<input id="keyword" placeholder="ใส่เลขท้ายของรหัสครุภัณฑ์ เพื่อค้นหา">
+<button onclick="search()">ค้นหา</button>
+
+<table id="result"></table>
+
+<h4>รายการที่เลือก</h4>
+<ul id="selected"></ul>
+
+<button onclick="submitSurvey()">ส่งแบบสำรวจ</button>
+</div>
+
+<script>
+const API="https://script.google.com/macros/s/AKfycbwj8TX_Lwv_oRLd3CtFL7ORBSu4CyweKfdoxF5vi-7UBqPeml6EBNmCCLDJ7qmsKqjD/exec";
+let deptList=[], picked=[], userDept="";
+
+/* JSONP */
+function jsonp(url,cb){
+  return new Promise(res=>{
+    window[cb]=d=>res(d);
+    let s=document.createElement("script");
+    s.src=url+"&callback="+cb;
+    document.body.appendChild(s);
+  });
+}
+
+/* LOAD DEPT */
+(async()=>{
+  deptList=await jsonp(API+"?action=dept","cbDept");
+})();
+
+r_dept.oninput=()=>{
+  const v=r_dept.value.toLowerCase();
+  r_dept.setAttribute("list","deptList");
+  let dl=document.getElementById("deptList");
+  if(!dl){dl=document.createElement("datalist");dl.id="deptList";document.body.appendChild(dl);}
+  dl.innerHTML=deptList.filter(d=>d.toLowerCase().includes(v)).map(d=>`<option value="${d}">`).join("");
+};
+
+/* REGISTER */
+async function register(){
+  Swal.fire({title:"กำลังบันทึก...",didOpen:()=>Swal.showLoading()});
+  const r=await jsonp(`${API}?action=register
+  &email=${r_email.value}
+  &name=${r_name.value}
+  &user=${r_user.value}
+  &pass=${r_pass.value}
+  &dept=${r_dept.value}`,"cbReg");
+
+  if(r.success){
+    Swal.fire("สำเร็จ","ส่งรหัสยืนยันทาง Email แล้ว","success");
+    userDept=r_dept.value;
+    deptName.innerText="หน่วยงาน: "+userDept;
+    registerCard.classList.add("hidden");
+    surveyCard.classList.remove("hidden");
+  }else Swal.fire("ผิดพลาด",r.message,"error");
+}
+
+/* SEARCH */
+async function search(){
+  Swal.fire({title:"ค้นหา...",didOpen:()=>Swal.showLoading()});
+  const data=await jsonp(`${API}?action=search&key=${keyword.value}`,"cbSearch");
+  Swal.close();
+
+  result.innerHTML="<tr><th>รหัส</th><th>ชื่อ</th><th></th></tr>"+data.map(r=>{
+    let name=r[5].replace(keyword.value,`<span class=highlight>${keyword.value}</span>`);
+    return `<tr>
+      <td>${r[2]}</td>
+      <td>${name}</td>
+      <td><button onclick='add(${JSON.stringify(r)})'>ใช้งานอยู่</button></td>
+    </tr>`;
+  }).join("");
+}
+
+function add(r){
+  picked.push(r);
+  selected.innerHTML=picked.map(p=>`<li>${p[2]} - ${p[5]}</li>`).join("");
+}
+
+/* SUBMIT */
+async function submitSurvey(){
+  Swal.fire({title:"บันทึก...",didOpen:()=>Swal.showLoading()});
+  const r=await jsonp(`${API}?action=save&data=${encodeURIComponent(JSON.stringify(picked))}&dept=${userDept}`,"cbSave");
+  Swal.fire("สำเร็จ","บันทึกข้อมูลแล้ว","success");
+}
+</script>
 
 </body>
 </html>
