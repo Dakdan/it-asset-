@@ -6,26 +6,23 @@
 <input id="p" type="password">
 <button onclick="login()">Login</button>
 
-<h3>Register</h3>
-<input id="re" placeholder="email">
-<input id="rp" placeholder="password">
-<input id="rd" placeholder="dept">
-<button onclick="register()">Register</button>
-
+<script src="config.js"></script>
 <script>
-const API="https://script.google.com/macros/s/AKfycbwj8TX_Lwv_oRLd3CtFL7ORBSu4CyweKfdoxF5vi-7UBqPeml6EBNmCCLDJ7qmsKqjD/exec";
-
 function login(){
-  let s=document.createElement("script");
-  s.src=API+"?action=login&username="+u.value+"&password="+p.value+"&callback=cb";
+  const s=document.createElement("script");
+  s.src=GAS_API+
+    "?action=login"+
+    "&username="+encodeURIComponent(u.value)+
+    "&password="+encodeURIComponent(p.value)+
+    "&callback=cb";
   document.body.appendChild(s);
 }
-function register(){
-  let s=document.createElement("script");
-  s.src=API+"?action=register&email="+re.value+"&password="+rp.value+"&dept="+rd.value+"&callback=cb";
-  document.body.appendChild(s);
+function cb(res){
+  if(res.success){
+    setSession(res);
+    location.href="dashboard.html";
+  }else alert("Login failed");
 }
-function cb(r){ alert(JSON.stringify(r)); }
 </script>
 </body>
 </html>
