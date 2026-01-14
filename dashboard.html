@@ -1,38 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
+<meta charset="utf-8">
+<title>Dashboard</title>
+<script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body onload="load()">
+
+<body>
 <h2>Dashboard</h2>
-<canvas id="c"></canvas>
+<canvas id="chart"></canvas>
+<br>
+<button onclick="logout()">Logout</button>
 
-<script src="config.js"></script>
 <script>
-requireLogin();
+const user = JSON.parse(sessionStorage.getItem("user"));
+if(!user) location.href="index.html";
 
-function load(){
-  const s=document.createElement("script");
-  s.src=GAS_API+"?action=dashboard&callback=cb";
-  document.body.appendChild(s);
-}
-function cb(data){
-  new Chart(c,{
-    type:"pie",
+fetch(GAS_API + "?action=dashboard")
+.then(r=>r.json())
+.then(data=>{
+  new Chart(document.getElementById("chart"),{
+    type:"bar",
     data:{
       labels:Object.keys(data),
       datasets:[{
+        label:"จำนวนครุภัณฑ์",
         data:Object.values(data)
       }]
     }
   });
+});
+
+function logout(){
+  sessionStorage.clear();
+  location.href="index.html";
 }
 </script>
 </body>
 </html>
-<link rel="manifest" href="manifest.json">
-<script>
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("service-worker.js");
-}
-</script>
