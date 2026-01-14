@@ -1,17 +1,7 @@
 self.addEventListener("install",e=>{
   e.waitUntil(
-    caches.open("itasset").then(c=>
-      c.addAll([
-        "index.html",
-        "dashboard.html",
-        "admin.html",
-        "config.js"
-      ])
+    caches.open("it-asset").then(c=>
+      c.addAll(["index.html","dashboard.html","admin.html"])
     )
-  );
-});
-self.addEventListener("fetch",e=>{
-  e.respondWith(
-    caches.match(e.request).then(r=>r||fetch(e.request))
   );
 });
