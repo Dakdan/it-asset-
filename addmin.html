@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<body onload="load()">
+<h2>ADMIN</h2>
+<table border="1">
+<thead>
+<tr><th>Email</th><th>Dept</th><th>Role</th></tr>
+</thead>
+<tbody id="tb"></tbody>
+</table>
+
+<script src="config.js"></script>
+<script>
+requireLogin();
+if(getSession().role!=="ADMIN") alert("No permission");
+
+function load(){
+  const s=document.createElement("script");
+  s.src=GAS_API+"?action=adminUsers&callback=cb";
+  document.body.appendChild(s);
+}
+function cb(list){
+  tb.innerHTML="";
+  list.forEach(u=>{
+    tb.innerHTML+=
+      `<tr><td>${u.email}</td><td>${u.dept}</td><td>${u.role}</td></tr>`;
+  });
+}
+</script>
+</body>
+</html>
