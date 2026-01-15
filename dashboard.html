@@ -1,26 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>Dashboard</title>
-  <script src="config.js"></script>
+<meta charset="UTF-8">
+<title>Dashboard</title>
 </head>
-<body>
+<body style="font-family:sans-serif">
 
 <h2>Dashboard</h2>
-<div id="out"></div>
+
+<p id="info"></p>
 
 <script>
 const role = localStorage.getItem("role");
 const dept = localStorage.getItem("dept");
 
 if(!role){
-  location.href="index.html";
+  location.href = "index.html";
+}else{
+  info.innerText = `Role: ${role} | แผนก: ${dept}`;
 }
-
-api("dashboard").then(d=>{
-  out.innerHTML = "<pre>"+JSON.stringify(d,null,2)+"</pre>";
-});
 </script>
 
 </body>
