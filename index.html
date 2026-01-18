@@ -1,53 +1,176 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>ระบบสำรวจครุภัณฑ์คอมพิวเตอร์</title>
-  <script src="./config.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบสำรวจครุภัณฑ์คอมพิวเตอร์</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root { --pink: #ff85a2; --dark-pink: #f06292; --border: #333; }
+        body { font-family: 'Kanit', sans-serif; background-color: #fff5f7; color: #333; }
+        .cute-card { 
+            background: white; border: 3px solid var(--border); 
+            border-radius: 20px; box-shadow: 8px 8px 0px var(--pink); 
+        }
+        .header-section { 
+            background: white; border-bottom: 5px solid var(--pink); padding: 15px;
+            margin-bottom: 30px;
+        }
+        .btn-cute { 
+            background-color: var(--pink); border: 2px solid var(--border);
+            color: white; border-radius: 12px; font-weight: 600;
+            transition: 0.3s;
+        }
+        .btn-cute:hover { background-color: var(--dark-pink); transform: translateY(-2px); color: white; }
+        .highlight { background-color: #ffeb3b; font-weight: bold; border-radius: 4px; padding: 0 2px; }
+        .form-control { border: 2px solid #eee; border-radius: 10px; }
+        .form-control:focus { border-color: var(--pink); box-shadow: none; }
+    </style>
 </head>
-<body style="font-family:sans-serif">
+<body>
 
-<h2>ระบบสำรวจครุภัณฑ์คอมพิวเตอร์</h2>
-<h3>โรงพยาบาลอุดรธานี</h3>
+<div class="header-section text-center">
+    <img src="https://img2.pic.in.th/pic/ink.png" style="width: 70px;">
+    <h4 class="mt-2 mb-0">โรงพยาบาลอุดรธานี</h4>
+    <p class="small text-muted mb-0">กลุ่มงาน: เทคโนโลยีสารสนเทศคอมพิวเตอร์ โทร 1125, 1126, 1485</p>
+</div>
 
-<hr>
+<div class="container mb-5">
+    <div id="registerSection" class="row justify-content-center">
+        <div class="col-md-6 card cute-card p-4">
+            <h5 class="text-center mb-4"><i class="fas fa-user-plus me-2"></i>ลงทะเบียนเข้าใช้งาน</h5>
+            <div class="mb-3">
+                <label>Email</label>
+                <input type="email" id="email" class="form-control" placeholder="example@mail.com">
+            </div>
+            <div class="mb-3">
+                <label>ชื่อ-สกุล</label>
+                <input type="text" id="fullname" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label>หน่วยงาน</label>
+                <input list="deptList" id="dept" class="form-control" placeholder="พิมพ์เพื่อค้นหาหน่วยงาน...">
+                <datalist id="deptList"></datalist>
+            </div>
+            <button class="btn btn-cute w-100 p-2" onclick="register()">ลงทะเบียนรับรหัสผ่าน</button>
+        </div>
+    </div>
 
-<label>Username</label><br>
-<input id="user"><br><br>
+    <div id="surveySection" class="d-none">
+        <div class="card cute-card p-4 mb-4 text-center">
+            <h5 id="displayDeptName">หน่วยงาน: -</h5>
+            <p>สำรวจตรวจสอบครุภัณฑ์คอมพิวเตอร์ ประจำปี 2568</p>
+            <div class="input-group">
+                <input type="text" id="searchInput" class="form-control" placeholder="ใส่เลขท้ายของรหัสครุภัณฑ์">
+                <button class="btn btn-cute px-4" onclick="searchAsset()"><i class="fas fa-search"></i> ค้นหา</button>
+            </div>
+        </div>
 
-<label>Password</label><br>
-<input id="pass" type="password"><br><br>
-
-<button onclick="login()">เข้าสู่ระบบ</button>
-
-<p id="msg" style="color:red"></p>
+        <div id="resultTable" class="table-responsive mt-3">
+            </div>
+    </div>
+</div>
 
 <script>
-function login(){
-  if(typeof api !== "function"){
-    msg.innerText = "config.js ไม่ถูกโหลด";
-    return;
-  }
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyaZCEVnz-5M-FC5Sr_8TJsrsnEk-gxwAW9iG0554doOqcwYOkP-pFueXGuZ4UO5MJDcg/exec";
 
-  const u = user.value;
-  const p = pass.value;
+    // 1. โหลดข้อมูลหน่วยงาน
+    function loadDepartments() {
+        callApi({ action: 'getDepartments' }, (res) => {
+            const list = document.getElementById('deptList');
+            res.data.forEach(d => {
+                let opt = document.createElement('option');
+                opt.value = d;
+                list.appendChild(opt);
+            });
+        });
+    }
 
-  api("login",{username:u,password:p})
-    .then(res=>{
-      if(res.success){
-        localStorage.setItem("role",res.role);
-        localStorage.setItem("dept",res.dept);
-        location.href = "dashboard.html";
-      }else{
-        msg.innerText="ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
-      }
-    })
-    .catch(err=>{
-      msg.innerText = "เชื่อมต่อ API ไม่ได้";
-      console.error(err);
-    });
-}
+    // 2. ลงทะเบียน
+    function register() {
+        const data = {
+            action: 'register',
+            email: document.getElementById('email').value,
+            name: document.getElementById('fullname').value,
+            dept: document.getElementById('dept').value
+        };
+        Swal.fire({ title: 'กำลังส่งข้อมูล...', didOpen: () => Swal.showLoading() });
+        callApi(data, (res) => {
+            Swal.fire('สำเร็จ', res.message, 'success').then(() => {
+                document.getElementById('registerSection').classList.add('d-none');
+                document.getElementById('surveySection').classList.remove('d-none');
+                document.getElementById('displayDeptName').innerText = "หน่วยงาน: " + data.dept;
+            });
+        });
+    }
+
+    // 3. ค้นหาครุภัณฑ์
+    function searchAsset() {
+        const query = document.getElementById('searchInput').value;
+        if(!query) return;
+        
+        Swal.fire({ title: 'กำลังค้นหา...', didOpen: () => Swal.showLoading() });
+        callApi({ action: 'searchAssets', query: query }, (res) => {
+            Swal.close();
+            let html = `<table class="table table-hover bg-white border">
+                <thead class="table-light"><tr><th>รหัสครุภัณฑ์</th><th>รายการ</th><th>จัดการ</th></tr></thead><tbody>`;
+            
+            res.data.forEach(item => {
+                // Highlight ตัวอักษร
+                let highlightedId = item.assetId.replace(new RegExp(query, "gi"), (match) => `<span class="highlight">${match}</span>`);
+                html += `<tr>
+                    <td>${highlightedId}</td>
+                    <td>${item.name}</td>
+                    <td><button class="btn btn-sm btn-outline-primary" onclick="showDetail('${encodeURIComponent(JSON.stringify(item))}')">รายละเอียด</button></td>
+                </tr>`;
+            });
+            html += `</tbody></table>`;
+            document.getElementById('resultTable').innerHTML = html;
+        });
+    }
+
+    function showDetail(itemStr) {
+        const item = JSON.parse(decodeURIComponent(itemStr));
+        Swal.fire({
+            title: 'รายละเอียดครุภัณฑ์',
+            html: `<div class="text-start">
+                <p><b>รหัส:</b> ${item.assetId}</p>
+                <p><b>ชื่อ:</b> ${item.name}</p>
+                <p><b>สเปค:</b> ${item.spec}</p>
+                <p><b>ราคา:</b> ${item.price} บาท</p>
+            </div>`,
+            showCancelButton: true,
+            confirmButtonText: 'ยืนยันการใช้งาน',
+            cancelButtonText: 'กลับ',
+            confirmButtonColor: '#ff85a2'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // ส่งข้อมูลบันทึก
+                Swal.fire('บันทึกสำเร็จ', '', 'success');
+            }
+        });
+    }
+
+    // ฟังก์ชันช่วยเรียก JSONP
+    function callApi(params, callback) {
+        const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+        window[callbackName] = function(data) {
+            delete window[callbackName];
+            document.body.removeChild(script);
+            callback(data);
+        };
+
+        const script = document.createElement('script');
+        let queryString = Object.keys(params).map(key => key + '=' + encodeURIComponent(params[key])).join('&');
+        script.src = `${SCRIPT_URL}?${queryString}&callback=${callbackName}`;
+        document.body.appendChild(script);
+    }
+
+    window.onload = loadDepartments;
 </script>
-
 </body>
 </html>
