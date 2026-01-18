@@ -1,2 +1,0 @@
-const GAS_URL="https://script.google.com/macros/s/AKfycbwj8TX_Lwv_oRLd3CtFL7ORBSu4CyweKfdoxF5vi-7UBqPeml6EBNmCCLDJ7qmsKqjD/exec
-";function api(action,params={}){return new Promise(res=>{const cb="cb"+Date.now();params.action=action;params.callback=cb;const q=Object.keys(params).map(k=>k+"="+encodeURIComponent(params[k])).join("&");window[cb]=(d)=>{res(d);delete window[cb];s.remove();};const s=document.createElement("script");s.src=GAS_URL+"?"+q;document.body.appendChild(s);});}
