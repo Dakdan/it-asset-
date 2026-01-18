@@ -1,1 +1,59 @@
-<!-- index placeholder -->
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>ระบบสำรวจครุภัณฑ์</title>
+</head>
+<body>
+
+<h2>Login</h2>
+<input id="user" placeholder="username">
+<input id="pass" type="password" placeholder="password">
+<button onclick="login()">Login</button>
+
+<hr>
+
+<h2>ค้นหาครุภัณฑ์</h2>
+<input id="kw" placeholder="Asset ID">
+<button onclick="search()">Search</button>
+
+<table border="1" id="tbl"></table>
+
+<script>
+const API = 'https://script.google.com/macros/s/AKfycbyaZCEVnz-5M-FC5Sr_8TJsrsnEk-gxwAW9iG0554doOqcwYOkP-pFueXGuZ4UO5MJDcg/exec';
+
+function jsonp(url, cb) {
+  const s = document.createElement('script');
+  s.src = url + '&callback=' + cb;
+  document.body.appendChild(s);
+}
+
+function login() {
+  jsonp(`${API}?action=login&username=${user.value}&password=${pass.value}`, 'loginCB');
+}
+
+function loginCB(r) {
+  if (!r.success) return alert(r.message);
+  alert('ยินดีต้อนรับ ' + r.user.name);
+}
+
+function search() {
+  jsonp(`${API}?action=searchAssets&keyword=${kw.value}`, 'searchCB');
+}
+
+function searchCB(r) {
+  if (!r.success) return alert(r.message);
+
+  tbl.innerHTML = '<tr><th>AssetID</th><th>Name</th><th>Dept</th></tr>';
+  r.data.forEach(a => {
+    tbl.innerHTML += `<tr>
+      <td>${a.AssetID}</td>
+      <td>${a.Name}</td>
+      <td>${a.Dept}</td>
+    </tr>`;
+  });
+}
+</script>
+
+</body>
+</html><!-- index placeholder -->
