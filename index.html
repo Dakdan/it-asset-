@@ -71,19 +71,45 @@ function callAPI(params, cb){
 }
 
 /* ===== โหลดหน่วยงาน ===== */
+<script>
 window.onload = () => {
   callAPI({ action: "departments" }, (res) => {
-    const select = document.getElementById("reg-dept");
 
-    if (!res.success || !Array.isArray(res.data)) {
+    const select = document.getElementById("reg-dept");
+    select.innerHTML = '<option value="">-- เลือกหน่วยงาน --</option>';
+
+    /* 🔥 แก้กรณี res เป็น string */
+    if (typeof res === "string") {
+      try {
+        res = JSON.parse(res);
+      } catch (e) {
+        Swal.fire("ผิดพลาด", "ข้อมูลหน่วยงานผิดรูปแบบ", "error");
+        return;
+      }
+    }
+
+    console.log("API response:", res); // ✅ debug
+
+    if (!res || !Array.isArray(res.data)) {
       Swal.fire("ผิดพลาด", "ไม่พบข้อมูลหน่วยงาน", "error");
       return;
     }
 
     res.data.forEach(dep => {
       const opt = document.createElement("option");
-      opt.value = dep.name;
-      opt.textContent = dep.name;
+
+      /* 🔥 รองรับหลายชื่อคอลัมน์ */
+      const deptName =
+        dep.name ||
+        dep.Note3 ||
+        dep.DEPNAME ||
+        dep.dept ||
+        "";
+
+      if (!deptName) return;
+
+      opt.value = deptName;
+      opt.textContent = deptName;
       select.appendChild(opt);
     });
   });
