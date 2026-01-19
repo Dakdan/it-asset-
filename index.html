@@ -2,76 +2,83 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>ระบบสำรวจครุภัณฑ์</title>
+<title>ลงทะเบียนระบบสำรวจครุภัณฑ์</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
 body{font-family:sans-serif;background:#f5f5f5}
-.container{max-width:420px;background:#fff;margin:30px auto;padding:20px;border-radius:8px}
+.box{max-width:420px;background:#fff;margin:30px auto;padding:20px;border-radius:8px}
 input,select,button{width:100%;padding:10px;margin-top:10px}
 button{background:#ff69b4;color:#fff;border:none;border-radius:5px}
 </style>
 </head>
 
 <body>
-<div class="container">
-<h3>ลงทะเบียนเข้าใช้งาน</h3>
+<div class="box">
+<h3>ลงทะเบียนผู้ใช้งาน</h3>
 
-<input id="name" placeholder="ชื่อ - สกุล">
+<input id="fullname" placeholder="ชื่อ - สกุล">
 
-<select id="dept">
+<select id="deptSelect">
   <option value="">-- เลือกหน่วยงาน --</option>
 </select>
 
 <input id="email" placeholder="Email">
-<button onclick="register()">ลงทะเบียน</button>
+
+<button onclick="registerUser()">ลงทะเบียน</button>
 </div>
 
 <script>
-const API =
+const API_URL =
 "https://script.google.com/macros/s/AKfycbwj8TX_Lwv_oRLd3CtFL7ORBSu4CyweKfdoxF5vi-7UBqPeml6EBNmCCLDJ7qmsKqjD/exec";
 
-function jsonp(params, cb){
-  const fn = "cb_" + Date.now();
-  params.callback = fn;
+/* ===== JSONP ===== */
+function callAPI(params, callback){
+  const cbName = "cb_" + Date.now();
+  params.callback = cbName;
 
-  window[fn] = res => {
-    delete window[fn];
-    document.body.removeChild(s);
-    cb(res);
+  window[cbName] = (res) => {
+    delete window[cbName];
+    document.body.removeChild(script);
+    callback(res);
   };
 
-  const q = Object.keys(params).map(k=>`${k}=${encodeURIComponent(params[k])}`).join("&");
-  const s = document.createElement("script");
-  s.src = API + "?" + q;
-  document.body.appendChild(s);
+  const query = Object.keys(params)
+    .map(k => `${k}=${encodeURIComponent(params[k])}`)
+    .join("&");
+
+  const script = document.createElement("script");
+  script.src = `${API_URL}?${query}`;
+  document.body.appendChild(script);
 }
 
-/* โหลดหน่วยงาน */
+/* ===== Load Department ===== */
 window.onload = () => {
-  jsonp({action:"departments"}, res => {
-    if(!res.success) {
-      Swal.fire("โหลดหน่วยงานไม่สำเร็จ");
+  callAPI({action:"departments"}, res => {
+    if(!res || !res.success){
+      Swal.fire("ผิดพลาด","ไม่สามารถโหลดหน่วยงานได้","error");
       return;
     }
 
-    const sel = document.getElementById("dept");
+    const sel = document.getElementById("deptSelect");
     res.data.forEach(d=>{
-      const o = document.createElement("option");
-      o.value = d.deptId;     // 001
-      o.textContent = d.name; // AE / ตึก OPD ใหม่/ F 1
-      sel.appendChild(o);
+      const opt = document.createElement("option");
+      opt.value = d.deptId;       // 001
+      opt.textContent = d.name;  // AE / ตึก OPD ใหม่/ F 1
+      sel.appendChild(opt);
     });
   });
 };
 
-function register(){
-  const name = name.value.trim();
-  const email = email.value.trim();
-  const deptSel = document.getElementById("dept");
+/* ===== Register ===== */
+function registerUser(){
+  const fullName = document.getElementById("fullname").value.trim();
+  const email    = document.getElementById("email").value.trim();
+  const deptSel  = document.getElementById("deptSelect");
 
-  if(!name || !email || !deptSel.value){
+  if(!fullName || !email || !deptSel.value){
     Swal.fire("กรุณากรอกข้อมูลให้ครบ");
     return;
   }
@@ -80,10 +87,10 @@ function register(){
     icon:"success",
     title:"ลงทะเบียนสำเร็จ",
     html:`
-      ชื่อ: ${name}<br>
-      หน่วยงาน: ${deptSel.options[deptSel.selectedIndex].text}<br>
-      DeptID: ${deptSel.value}<br>
-      Email: ${email}
+      <b>ชื่อ:</b> ${fullName}<br>
+      <b>หน่วยงาน:</b> ${deptSel.options[deptSel.selectedIndex].text}<br>
+      <b>DeptID:</b> ${deptSel.value}<br>
+      <b>Email:</b> ${email}
     `
   });
 }
