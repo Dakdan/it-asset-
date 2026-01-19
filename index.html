@@ -70,166 +70,89 @@
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbwj8TX_Lwv_oRLd3CtFL7ORBSu4CyweKfdoxF5vi-7UBqPeml6EBNmCCLDJ7qmsKqjD/exec";
 
-let confirmedData = [];
 let userData = {};
+let confirmedData = [];
 
-/* ================= JSONP ================= */
-function callAPI(params, cb) {
-  const cbName = "cb_" + Date.now();
-  params.callback = cbName;
-
-  window[cbName] = (res) => {
-    delete window[cbName];
-    document.body.removeChild(script);
-    cb(res);
-  };
-
-  const script = document.createElement("script");
-  script.src = API_URL + "?" + new URLSearchParams(params).toString();
-  document.body.appendChild(script);
+/* =============== JSONP =============== */
+function callAPI(p, cb){
+  const c="cb_"+Date.now(); p.callback=c;
+  window[c]=(r)=>{delete window[c];document.body.removeChild(s);cb(r);}
+  const s=document.createElement("script");
+  s.src=API_URL+"?"+new URLSearchParams(p);
+  document.body.appendChild(s);
 }
 
-/* ================= LOAD DEPARTMENT ================= */
-window.onload = () => {
-  callAPI({ action: "departments" }, (res) => {
-    if (!res.success) return;
-    const dl = document.getElementById("depts");
-    dl.innerHTML = "";
-    res.data.forEach(d => {
-      dl.innerHTML += `<option value="${d.name}">`;
-    });
+/* =============== LOAD DEPT =============== */
+window.onload=()=>{
+  callAPI({action:"departments"},res=>{
+    const dl=document.getElementById("depts");
+    res.data.forEach(d=>dl.innerHTML+=`<option value="${d.name}">`);
   });
 };
 
-/* ================= REGISTER (mock login) ================= */
-function register() {
-  userData = {
-    email: document.getElementById("reg-email").value.trim(),
-    name: document.getElementById("reg-name").value.trim(),
-    dept: document.getElementById("reg-dept").value.trim()
+/* =============== LOGIN =============== */
+function register(){
+  userData={
+    email:reg-email.value,
+    name:reg-name.value,
+    dept:reg-dept.value
   };
+  if(!userData.email||!userData.name||!userData.dept)
+    return Swal.fire("กรอกข้อมูลให้ครบ");
 
-  if (!userData.email || !userData.name || !userData.dept) {
-    Swal.fire("กรุณากรอกข้อมูลให้ครบ");
-    return;
-  }
-
-  document.getElementById("section-reg").classList.add("hidden");
-  document.getElementById("section-survey").classList.remove("hidden");
-  document.getElementById("user-dept-display").innerText =
-    "หน่วยงาน: " + userData.dept;
+  section-reg.classList.add("hidden");
+  section-survey.classList.remove("hidden");
+  user-dept-display.innerText="หน่วยงาน: "+userData.dept;
 }
 
-/* ================= SEARCH ASSET ================= */
-function searchAsset() {
-  const q = document.getElementById("asset-query").value.trim();
-  if (!q) return;
-
-  Swal.fire({ title: "ค้นหา...", didOpen: () => Swal.showLoading() });
-
-  callAPI({ action: "searchAssets", query: q }, (res) => {
-    Swal.close();
-    const box = document.getElementById("search-results");
-    box.innerHTML = "";
-
-    if (!res.success || res.data.length === 0) {
-      box.innerHTML = `<div class="alert alert-warning">ไม่พบข้อมูล</div>`;
-      return;
-    }
-
-    res.data.forEach(item => {
-      box.innerHTML += `
-        <div class="asset-card border-start border-4 border-primary">
-          <small class="text-muted">AssetID: ${item.assetId}</small>
-          <h6>${item.name}</h6>
-          <p class="small">${item.detail}</p>
-          <button class="btn btn-cute btn-sm"
-            onclick='addAsset(${JSON.stringify(item)})'>
-            เลือก
-          </button>
-        </div>
-      `;
+/* =============== SEARCH =============== */
+function searchAsset(){
+  callAPI({action:"searchAssets",query:asset-query.value},res=>{
+    const box=search-results; box.innerHTML="";
+    res.data.forEach(i=>{
+      box.innerHTML+=`
+      <div class="asset-card">
+        <b>${i.assetId}</b><br>${i.name}
+        <button class="btn btn-cute btn-sm"
+          onclick='addAsset(${JSON.stringify(i)})'>เลือก</button>
+      </div>`;
     });
   });
 }
 
-/* ================= ADD ASSET ================= */
-function addAsset(item) {
-  if (confirmedData.find(x => x.assetId === item.assetId)) {
-    Swal.fire("เลือกไปแล้ว");
-    return;
-  }
-  confirmedData.push(item);
-  renderConfirmed();
+/* =============== ADD =============== */
+function addAsset(i){
+  if(confirmedData.find(x=>x.assetId===i.assetId))
+    return Swal.fire("เลือกแล้ว");
+  confirmedData.push(i);
+  confirmed-list.classList.remove("hidden");
+  survey-items.innerHTML=confirmedData.map(x=>x.assetId).join(", ");
 }
 
-/* ================= RENDER CONFIRM ================= */
-function renderConfirmed() {
-  const div = document.getElementById("survey-items");
-  const wrap = document.getElementById("confirmed-list");
-  wrap.classList.remove("hidden");
-
-  div.innerHTML = confirmedData.map(x => `
-    <div class="badge bg-white text-dark border p-2 m-1 cute-border">
-      ${x.assetId} - ${x.name}
-    </div>
-  `).join("");
-}
-
-/* ================= SUBMIT SURVEY ================= */
-function submitSurvey() {
-  if (confirmedData.length === 0) {
-    Swal.fire("ยังไม่ได้เลือกรายการ");
-    return;
-  }
-
-  Swal.fire({ title: "กำลังบันทึก...", didOpen: () => Swal.showLoading() });
-
-  let count = 0;
-  confirmedData.forEach(item => {
-    callAPI({
-      action: "saveSurvey",
-      data: JSON.stringify({
-        assetId: item.assetId,
-        assetGroup: item.assetGroup,
-        name: item.name,
-        detail: item.detail,
-        deptName: userData.dept,
-        maStatus: item.maStatus,
-        coStatus: item.coStatus
-      })
-    }, () => {
-      count++;
-      if (count === confirmedData.length) {
-        Swal.fire("สำเร็จ", "บันทึกข้อมูลเรียบร้อย", "success")
-          .then(showReport);
-      }
+/* =============== SUBMIT =============== */
+function submitSurvey(){
+  let done=0;
+  confirmedData.forEach(i=>{
+    callAPI({action:"saveSurvey",data:JSON.stringify({...i,deptName:userData.dept})},()=>{
+      if(++done===confirmedData.length) showReport();
     });
   });
 }
 
-/* ================= REPORT ================= */
-function showReport() {
+/* =============== REPORT =============== */
+function showReport(){
   document.querySelector(".no-print").classList.add("hidden");
-  document.getElementById("section-report").classList.add("print-only");
-
-  document.getElementById("report-dept").innerText = userData.dept;
-  document.getElementById("report-user").innerText = userData.name;
-  document.getElementById("report-date").innerText =
-    new Date().toLocaleDateString("th-TH");
-
-  document.getElementById("report-table-body").innerHTML =
-    confirmedData.map(x => `
-      <tr>
-        <td>${x.assetId}</td>
-        <td>${x.name}</td>
-        <td>ปกติ</td>
-      </tr>
-    `).join("");
-
+  section-report.classList.add("print-only");
+  report-dept.innerText=userData.dept;
+  report-user.innerText=userData.name;
+  report-date.innerText=new Date().toLocaleDateString("th-TH");
+  report-table-body.innerHTML=confirmedData.map(x=>`
+    <tr><td>${x.assetId}</td><td>${x.name}</td><td>ปกติ</td></tr>
+  `).join("");
   window.print();
 }
 </script>
+
 
 </body>
 </html>
