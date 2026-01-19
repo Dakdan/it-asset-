@@ -4,16 +4,18 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwj8TX_Lwv_oRLd3CtFL7OR
 let confirmedData = [];
 let userData = {};
 
-// ===== JSONP CALL =====
+// ===== JSONP CALL (FIXED) =====
 function callAPI(params, cb) {
-    const callbackName = 'jsonp_' + Date.now();
-    window[callbackName] = (data) => {
+    const callbackName = "cb_" + Date.now();
+
+    const script = document.createElement("script");
+
+    window[callbackName] = function (res) {
+        cb(res);
         delete window[callbackName];
-        document.body.removeChild(script);
-        cb(data);
+        script.remove();
     };
 
-    const script = document.createElement('script');
     const query = new URLSearchParams({
         ...params,
         callback: callbackName
@@ -22,6 +24,69 @@ function callAPI(params, cb) {
     script.src = `${API_URL}?${query}`;
     document.body.appendChild(script);
 }
+
+// ===== LOAD DEPARTMENTS =====
+window.onload = function () {
+    callAPI({ action: "departments" }, function (res) {
+        const dl = document.getElementById("depts");
+        dl.innerHTML = "";
+
+        if (!Array.isArray(res)) {
+            Swal.fire("ผิดพลาด", "ไม่พบข้อมูลหน่วยงาน", "error");
+            return;
+        }
+
+        res.forEach(d => {
+            dl.innerHTML += `<option value="${d}">`;
+        });
+    });
+};
+
+// ===== REGISTER =====
+function register() {
+    userData = {
+        email: document.getElementById("reg-email").value.trim(),
+        name: document.getElementById("reg-name").value.trim(),
+        dept: document.getElementById("reg-dept").value.trim()
+    };
+
+    if (!userData.email || !userData.name || !userData.dept) {
+        Swal.fire("กรุณากรอกข้อมูลให้ครบ");
+        return;
+    }
+
+    document.getElementById("section-reg").classList.add("hidden");
+    document.getElementById("section-survey").classList.remove("hidden");
+    document.getElementById("user-dept-display").innerText =
+        "หน่วยงาน: " + userData.dept;
+}
+
+// ===== DUMMY FUNCTIONS =====
+function searchAsset() {
+    Swal.fire("ตัวอย่าง", "ยังไม่ได้เชื่อมข้อมูลครุภัณฑ์", "info");
+}
+
+function submitSurvey() {
+    Swal.fire("สำเร็จ", "ตัวอย่างการส่งข้อมูล", "success")
+        .then(showReport);
+}
+
+function showReport() {
+    document.querySelector(".no-print").classList.add("hidden");
+    document.getElementById("section-report").classList.add("print-only");
+
+    document.getElementById("report-dept").innerText = userData.dept;
+    document.getElementById("report-user").innerText = userData.name;
+    document.getElementById("report-date").innerText =
+        new Date().toLocaleDateString("th-TH");
+
+    document.getElementById("report-table-body").innerHTML =
+        `<tr><td>-</td><td>ตัวอย่าง</td><td>ปกติ</td></tr>`;
+
+    window.print();
+}
+</script>
+
 
 // ===== LOAD DEPARTMENTS =====
 window.onload = () => {
