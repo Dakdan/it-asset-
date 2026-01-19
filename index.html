@@ -57,20 +57,24 @@ function callAPI(params, callback){
 /* ===== Load Department ===== */
 window.onload = () => {
   callAPI({action:"departments"}, res => {
-    if(!res || !res.success){
-      Swal.fire("ผิดพลาด","ไม่สามารถโหลดหน่วยงานได้","error");
+
+    if(!res.success){
+      alert("โหลดหน่วยงานไม่สำเร็จ");
       return;
     }
 
     const sel = document.getElementById("deptSelect");
+
     res.data.forEach(d=>{
-      const opt = document.createElement("option");
-      opt.value = d.deptId;       // 001
-      opt.textContent = d.name;  // AE / ตึก OPD ใหม่/ F 1
-      sel.appendChild(opt);
+      const o = document.createElement("option");
+      o.value = d.deptId;
+      o.textContent = d.name;
+      sel.appendChild(o);
     });
+
   });
 };
+
 
 /* ===== Register ===== */
 function registerUser(){
