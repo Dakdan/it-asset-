@@ -2,55 +2,35 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>ระบบสำรวจครุภัณฑ์คอมพิวเตอร์</title>
+<title>ระบบสำรวจครุภัณฑ์</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
-body { font-family: sans-serif; background:#f5f5f5; }
-.container {
-  max-width:420px;
-  background:#fff;
-  margin:40px auto;
-  padding:20px;
-  border-radius:8px;
-}
-input, select, button {
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-}
-button {
-  background:#ff69b4;
-  color:#fff;
-  border:none;
-  border-radius:5px;
-  cursor:pointer;
-}
+body{font-family:sans-serif;background:#f5f5f5}
+.container{max-width:400px;background:#fff;margin:30px auto;padding:20px;border-radius:8px}
+input,select,button{width:100%;padding:10px;margin-top:10px}
+button{background:#ff69b4;color:#fff;border:none;border-radius:5px}
 </style>
 </head>
 
 <body>
-
 <div class="container">
-  <h3>ลงทะเบียนเข้าใช้งาน</h3>
+<h3>ลงทะเบียนเข้าใช้งาน</h3>
 
-  <input id="reg-name" placeholder="ชื่อ - สกุล">
+<input id="reg-name" placeholder="ชื่อ - สกุล">
 
-  <select id="reg-dept">
-    <option value="">-- เลือกหน่วยงาน --</option>
-  </select>
+<select id="reg-dept">
+  <option value="">-- เลือกหน่วยงาน --</option>
+</select>
 
-  <input id="reg-email" placeholder="Email">
-
-  <button onclick="register()">ลงทะเบียน</button>
+<input id="reg-email" placeholder="Email">
+<button onclick="register()">ลงทะเบียน</button>
 </div>
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbwj8TX_Lwv_oRLd3CtFL7ORBSu4CyweKfdoxF5vi-7UBqPeml6EBNmCCLDJ7qmsKqjD/exec";
 
-/* ===== JSONP ===== */
 function callAPI(params, cb){
   const cbName = "cb_" + Date.now();
   params.callback = cbName;
@@ -61,82 +41,48 @@ function callAPI(params, cb){
     cb(res);
   };
 
-  const query = Object.keys(params)
-    .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`)
-    .join("&");
-
+  const q = Object.keys(params).map(k=>`${k}=${encodeURIComponent(params[k])}`).join("&");
   const script = document.createElement("script");
-  script.src = `${API_URL}?${query}`;
+  script.src = API_URL + "?" + q;
   document.body.appendChild(script);
 }
 
-/* ===== โหลดหน่วยงาน ===== */
-<script>
+/* โหลดหน่วยงาน */
 window.onload = () => {
-  callAPI({ action: "departments" }, (res) => {
-
-    const select = document.getElementById("reg-dept");
-    select.innerHTML = '<option value="">-- เลือกหน่วยงาน --</option>';
-
-    /* 🔥 แก้กรณี res เป็น string */
-    if (typeof res === "string") {
-      try {
-        res = JSON.parse(res);
-      } catch (e) {
-        Swal.fire("ผิดพลาด", "ข้อมูลหน่วยงานผิดรูปแบบ", "error");
-        return;
-      }
-    }
-
-    console.log("API response:", res); // ✅ debug
-
-    if (!res || !Array.isArray(res.data)) {
-      Swal.fire("ผิดพลาด", "ไม่พบข้อมูลหน่วยงาน", "error");
+  callAPI({ action:"departments" }, res => {
+    if(!res.success) {
+      Swal.fire("โหลดหน่วยงานไม่สำเร็จ");
       return;
     }
 
-    res.data.forEach(dep => {
+    const sel = document.getElementById("reg-dept");
+    res.data.forEach(d=>{
       const opt = document.createElement("option");
-
-      /* 🔥 รองรับหลายชื่อคอลัมน์ */
-      const deptName =
-        dep.name ||
-        dep.Note3 ||
-        dep.DEPNAME ||
-        dep.dept ||
-        "";
-
-      if (!deptName) return;
-
-      opt.value = deptName;
-      opt.textContent = deptName;
-      select.appendChild(opt);
+      opt.value = d.deptId;
+      opt.textContent = d.name;
+      sel.appendChild(opt);
     });
   });
 };
 
-/* ===== ลงทะเบียน ===== */
+/* ลงทะเบียน */
 function register(){
-  const name  = document.getElementById("reg-name").value.trim();
-  const dept  = document.getElementById("reg-dept").value;
-  const email = document.getElementById("reg-email").value.trim();
+  const name = reg-name.value.trim();
+  const deptId = reg-dept.value;
+  const deptText = reg-dept.options[reg-dept.selectedIndex].text;
+  const email = reg-email.value.trim();
 
-  if(!name || !dept || !email){
+  if(!name || !deptId || !email){
     Swal.fire("กรุณากรอกข้อมูลให้ครบ");
     return;
   }
 
   Swal.fire({
-    icon: "success",
-    title: "ลงทะเบียนสำเร็จ",
-    html: `
-      <b>ชื่อ:</b> ${name}<br>
-      <b>หน่วยงาน:</b> ${dept}<br>
-      <b>Email:</b> ${email}
-    `
+    icon:"success",
+    title:"ลงทะเบียนสำเร็จ",
+    html:`ชื่อ: ${name}<br>หน่วยงาน: ${deptText}<br>Email: ${email}`
   });
 }
 </script>
-
 </body>
 </html>
