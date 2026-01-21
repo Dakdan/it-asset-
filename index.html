@@ -1,130 +1,120 @@
 <!DOCTYPE html>
-<html lang="th">
+<html>
 <head>
-<meta charset="UTF-8">
-<title>IT UDH Maintenance & Service</title>
-<style>
-body {
-  font-family: sans-serif;
-  background: linear-gradient(135deg,#ff5fa2,#ffffff);
-  margin: 0;
-}
-header {
-  background:#fff;
-  padding:15px;
-  border-bottom:4px solid #ff5fa2;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-header img { height:40px; }
-.container {
-  padding:15px;
-}
-.input {
-  width:100%;
-  padding:10px;
-  margin:6px 0;
-  border:1px solid #ff5fa2;
-  border-radius:8px;
-}
-button {
-  background:#ff5fa2;
-  color:#fff;
-  border:none;
-  padding:10px 16px;
-  border-radius:8px;
-}
-table {
-  width:100%;
-  border-collapse:collapse;
-  background:#fff;
-}
-th,td {
-  border:1px solid #ffd1e3;
-  padding:6px;
-}
-</style>
+  <meta charset="utf-8">
+  <title>IT Service Desk</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f6f8;
+    }
+    header {
+      background: #003366;
+      color: #fff;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    header img {
+      height: 40px;
+    }
+    .container {
+      padding: 15px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 
 <body>
 
+<!-- LOGIN -->
+<div id="loginBox" class="container">
+  <h3>IT Login</h3>
+  <input id="email" placeholder="Email"><br><br>
+  <input id="password" type="password" placeholder="Password"><br><br>
+  <button onclick="login()">Login</button>
+  <div id="loginError" style="color:red"></div>
+</div>
+
+<!-- MAIN -->
+<div id="mainApp" class="hidden">
+
 <header>
-  <img src="https://i.imgur.com/LOGO.png">
-  <strong>IT UDH Maintenance & Service</strong>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/a/ab/Logo_TV_2015.png">
+  <div>
+    <div id="itName"></div>
+    <div id="itPosition"></div>
+  </div>
 </header>
 
 <div class="container">
-
-<h3>เข้าสู่ระบบ IT</h3>
-<input id="u" class="input" placeholder="Username">
-<input id="p" type="password" class="input" placeholder="Password">
-<button onclick="login()">Login</button>
-
-<hr>
-
-<h3>สร้าง / รับงาน</h3>
-
-<select id="jobType" class="input" onchange="loadSubType()">
-  <option value="">เลือกประเภทงาน</option>
-</select>
-
-<select id="jobSubType" class="input">
-  <option value="">เลือกงานย่อย</option>
-</select>
-
-<hr>
-
-<h3>งานทั้งหมด</h3>
-<table id="tbl"></table>
+  <h3>รายการงาน IT</h3>
+  <div id="ticketList"></div>
+</div>
 
 </div>
 
 <script>
-let itName = '';
+let currentUser = null;
 
 function login() {
-  google.script.run.withSuccessHandler(res=>{
-    if(res.success){
-      itName = res.name;
-      alert('ยินดีต้อนรับ '+res.name);
-      loadJobType();
-      loadTickets();
-    } else {
-      alert('Login ไม่ถูกต้อง');
+  google.script.run.withSuccessHandler(res => {
+    if (!res.success) {
+      document.getElementById('loginError').innerText = 'Login ไม่ถูกต้อง';
+      return;
     }
-  }).itLogin(u.value,p.value);
+    currentUser = res.user;
+    document.getElementById('loginBox').classList.add('hidden');
+    document.getElementById('mainApp').classList.remove('hidden');
+    document.getElementById('itName').innerText = res.user.name;
+    document.getElementById('itPosition').innerText = res.user.position;
+    loadTickets();
+  }).itLogin(
+    document.getElementById('email').value,
+    document.getElementById('password').value
+  );
 }
 
-function loadJobType(){
-  google.script.run.withSuccessHandler(data=>{
-    data.forEach(r=>{
-      jobType.innerHTML += `<option value="${r[0]}">${r[1]}</option>`;
+function loadTickets() {
+  google.script.run.withSuccessHandler(data => {
+    const box = document.getElementById('ticketList');
+    box.innerHTML = '';
+    data.forEach(t => {
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = `
+        <b>${t.JobID}</b><br>
+        หน่วยงาน: ${t.Department}<br>
+        ปัญหา: ${t.Problem}<br>
+        สถานะ: ${t.Status}<br><br>
+        <button onclick="takeJob('${t.JobID}')">รับงาน</button>
+      `;
+      box.appendChild(div);
     });
-  }).getJobTypes();
+  }).getTickets();
 }
 
-function loadSubType(){
-  jobSubType.innerHTML='<option value="">เลือกงานย่อย</option>';
-  google.script.run.withSuccessHandler(data=>{
-    data.forEach(r=>{
-      jobSubType.innerHTML += `<option value="${r[0]}">${r[2]}</option>`;
-    });
-  }).getJobSubTypes(jobType.value);
-}
-
-function loadTickets(){
-  google.script.run.withSuccessHandler(data=>{
-    let h = '<tr><th>JobID</th><th>ปัญหา</th><th>สถานะ</th></tr>';
-    for(let i=1;i<data.length;i++){
-      h+=`<tr>
-        <td>${data[i][0]}</td>
-        <td>${data[i][8]}</td>
-        <td>${data[i][10]}</td>
-      </tr>`;
-    }
-    tbl.innerHTML=h;
-  }).getAllTickets();
+function takeJob(jobId) {
+  google.script.run.withSuccessHandler(() => {
+    loadTickets();
+  }).updateTicketStatus(jobId, 'IN_PROGRESS', currentUser.name);
 }
 </script>
 
