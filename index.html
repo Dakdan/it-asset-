@@ -2,89 +2,111 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>IT Service Desk</title>
+<title>IT UDH Maintenance & Service</title>
+
 <style>
-body {
-  font-family: Arial;
-  background: linear-gradient(135deg,#ff6aa2,#ffffff);
+body{
+  margin:0;
+  font-family:Arial;
+  background:linear-gradient(135deg,#ff5fa2,#ffd1e6);
 }
-.container {
-  max-width: 420px;
-  margin: auto;
-  background: white;
-  border-radius: 16px;
-  padding: 16px;
-  border: 2px solid #ff6aa2;
+.container{
+  max-width:420px;
+  margin:40px auto;
+  background:#fff;
+  border-radius:20px;
+  padding:20px;
+  border:3px solid #ff5fa2;
 }
-.logo {
-  text-align: center;
-  font-size: 22px;
-  font-weight: bold;
-  color: #ff2f92;
+h1{
+  text-align:center;
+  color:#ff2f92;
 }
-input, select, textarea {
-  width: 100%;
-  margin-top: 8px;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ff6aa2;
+.input{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border-radius:10px;
+  border:1px solid #ff5fa2;
+  font-size:16px;
 }
-button {
-  margin-top: 12px;
-  width: 100%;
-  padding: 12px;
-  border-radius: 10px;
-  border: none;
-  background: #ff2f92;
-  color: white;
-  font-size: 16px;
+button{
+  width:100%;
+  padding:14px;
+  background:#ff2f92;
+  color:#fff;
+  border:none;
+  border-radius:14px;
+  font-size:18px;
 }
+button:hover{opacity:0.9;}
 </style>
 </head>
 
 <body>
 <div class="container">
-  <div class="logo">🖥️ IT SERVICE DESK</div>
+  <h1>🖥️ IT SERVICE DESK</h1>
 
-  <select id="jobType"></select>
-  <select id="jobSubType"></select>
+  <select id="jobType" class="input">
+    <option value="">เลือกประเภทงาน</option>
+  </select>
 
-  <textarea id="detail" placeholder="รายละเอียดปัญหา"></textarea>
-  <input id="contact" placeholder="เบอร์ติดต่อกลับ">
-  <input id="reporter" placeholder="ผู้แจ้ง">
+  <select id="jobSubType" class="input">
+    <option value="">เลือกงานย่อย</option>
+  </select>
 
-  <button onclick="save()">📨 บันทึกแจ้งงาน</button>
+  <textarea id="detail" class="input" placeholder="รายละเอียดงาน / อาการปัญหา"></textarea>
+  <input id="phone" class="input" placeholder="เบอร์ติดต่อกลับ">
+  <input id="reporter" class="input" placeholder="ผู้แจ้ง">
+
+  <button onclick="submitJob()">🔒 บันทึกแจ้งงาน</button>
 </div>
 
 <script>
-google.script.run.withSuccessHandler(t=>{
-  jobType.innerHTML='<option value="">เลือกประเภทงาน</option>';
-  t.forEach(r=>{
-    jobType.innerHTML+=`<option value="${r[1]}">${r[1]}</option>`;
-  });
-}).getJobType();
-
-let subTypeData=[];
-google.script.run.withSuccessHandler(d=>subTypeData=d).getJobSubType();
-
-jobType.onchange=()=>{
-  jobSubType.innerHTML='<option value="">เลือกงานย่อย</option>';
-  subTypeData.filter(r=>r[0]==jobType.value)
-    .forEach(r=>{
-      jobSubType.innerHTML+=`<option>${r[2]}</option>`;
+function loadJobTypes(){
+  google.script.run.withSuccessHandler(data=>{
+    const sel=document.getElementById("jobType");
+    data.forEach(d=>{
+      const o=document.createElement("option");
+      o.value=d.code;
+      o.text=d.name;
+      sel.appendChild(o);
     });
+  }).getJobTypes();
+}
+
+document.getElementById("jobType").onchange=function(){
+  const code=this.value;
+  const sub=document.getElementById("jobSubType");
+  sub.innerHTML='<option value="">เลือกงานย่อย</option>';
+  if(!code) return;
+
+  google.script.run.withSuccessHandler(data=>{
+    data.forEach(d=>{
+      const o=document.createElement("option");
+      o.value=d.code;
+      o.text=d.name;
+      sub.appendChild(o);
+    });
+  }).getJobSubTypes(code);
 };
 
-function save(){
-  google.script.run.saveJob({
+function submitJob(){
+  const form={
     jobType:jobType.value,
     jobSubType:jobSubType.value,
     detail:detail.value,
-    contact:contact.value,
+    phone:phone.value,
     reporter:reporter.value
-  });
-  alert("บันทึกเรียบร้อย");
+  };
+
+  google.script.run.withSuccessHandler(id=>{
+    alert("บันทึกสำเร็จ เลขที่งาน: "+id);
+    location.reload();
+  }).saveJob(form);
 }
+
+loadJobTypes();
 </script>
 </body>
 </html>
