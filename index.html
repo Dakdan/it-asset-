@@ -1,31 +1,33 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>ระบบงานแจ้งซ่อม IT</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: sans-serif; margin:0; background:#ffe6f0; }
-    header { background:#ff5fa2; color:#fff; padding:12px; display:flex; align-items:center; gap:10px; }
-    header img { height:40px; }
-    .container { padding:15px; }
-    .job { background:#fff; border-radius:8px; padding:10px; margin-bottom:10px; }
-    button { padding:6px 10px; margin-right:5px; }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
   <img src="โรงพยาบาลอุดรธานี.png">
-  <h3>ระบบงานแจ้งซ่อม IT</h3>
+  <div>
+    <h2>ระบบงานแจ้งซ่อม IT</h2>
+    <small>ฝ่ายเทคโนโลยีสารสนเทศ</small>
+  </div>
 </header>
 
-<div class="container">
-  <h3>📋 งานทั้งหมด</h3>
-  <div id="jobList">กำลังโหลด...</div>
-</div>
+<main>
+  <section class="card">
+    <h3>📋 รายการงานแจ้งซ่อม</h3>
+    <div id="jobList" class="loading">กำลังโหลดข้อมูล...</div>
+  </section>
+</main>
 
-<script src="./js/api.js"></script>
-<script src="./js/main.js"></script>
+<footer>
+  IT Maintenance System © 2026
+</footer>
+
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>
