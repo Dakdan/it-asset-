@@ -1,168 +1,90 @@
 <!DOCTYPE html>
-<html lang="th">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>⛑ IT UDH Maintenance & Service</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
+<title>IT Service Desk</title>
 <style>
-body{
-  margin:0;
-  font-family:Segoe UI,Tahoma;
-  background:linear-gradient(135deg,#ff5fa2,#ffd6ea);
-  min-height:100vh;
+body {
+  font-family: Arial;
+  background: linear-gradient(135deg,#ff6aa2,#ffffff);
 }
-header{
-  background:linear-gradient(90deg,#ff3f92,#ff85c1);
-  color:#fff;
-  padding:14px;
-  text-align:center;
-  border-bottom:4px solid #ffb3d9;
+.container {
+  max-width: 420px;
+  margin: auto;
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  border: 2px solid #ff6aa2;
 }
-.logo{
-  width:64px;
-  height:64px;
-  border-radius:50%;
-  background:#fff;
-  margin:auto;
-  margin-bottom:6px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#ff3f92;
-  font-weight:bold;
-  border:3px solid #ff85c1;
+.logo {
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: #ff2f92;
 }
-.container{padding:14px;max-width:520px;margin:auto;}
-.card{
-  background:#fff;
-  border-radius:16px;
-  padding:14px;
-  margin-bottom:14px;
-  border:2px solid #ffd1e8;
-  box-shadow:0 6px 16px rgba(0,0,0,.15);
+input, select, textarea {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ff6aa2;
 }
-h2{
-  margin:0 0 10px;
-  color:#ff3f92;
-  font-size:18px;
-  border-bottom:1px dashed #ffd1e8;
-  padding-bottom:6px;
-}
-.input,select,textarea{
-  width:100%;
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  margin-top:6px;
-}
-textarea{min-height:70px}
-.btn{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border:none;
-  border-radius:10px;
-  font-size:15px;
-  font-weight:bold;
-}
-.btn-main{background:linear-gradient(90deg,#ff3f92,#ff85c1);color:#fff;}
-.btn-accept{background:#4CAF50;color:#fff;}
-.btn-close{background:#607D8B;color:#fff;}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:13px;
-  border:1px solid #ffd1e8;
-}
-th{
-  background:#ffe3f1;
-  color:#ff3f92;
-}
-th,td{
-  padding:8px;
-  border:1px solid #ffd1e8;
-  text-align:center;
-}
-.status-new{color:#ff9800;font-weight:bold}
-.status-work{color:#2196F3;font-weight:bold}
-.status-done{color:#4CAF50;font-weight:bold}
-
-footer{
-  text-align:center;
-  font-size:12px;
-  color:#555;
-  padding:10px
+button {
+  margin-top: 12px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #ff2f92;
+  color: white;
+  font-size: 16px;
 }
 </style>
 </head>
 
 <body>
-
-<header>
-  <div class="logo">IT</div>
-  <h1>⛑ IT UDH Maintenance & Service</h1>
-  <p>กลุ่มงานเทคโนโลยีสารสนเทศ</p>
-</header>
-
 <div class="container">
+  <div class="logo">🖥️ IT SERVICE DESK</div>
 
-<!-- PHASE 2 : USER SESSION -->
-<div class="card">
-<h2>👤 ผู้เข้าใช้งานระบบ</h2>
-<div id="userInfo">
-<b>โกวิท กันคำเชิด</b><br>
-ตำแหน่ง: เจ้าหน้าที่ IT<br>
-หน่วยงาน: เทคโนโลยีสารสนเทศ / OPD / F2
-</div>
-</div>
+  <select id="jobType"></select>
+  <select id="jobSubType"></select>
 
-<!-- เปิดงาน -->
-<div class="card">
-<h2>📄 เปิดใบงาน (IT เปิดเอง)</h2>
+  <textarea id="detail" placeholder="รายละเอียดปัญหา"></textarea>
+  <input id="contact" placeholder="เบอร์ติดต่อกลับ">
+  <input id="reporter" placeholder="ผู้แจ้ง">
 
-<select id="jobType"></select>
-<select id="jobSubType"></select>
-
-<textarea id="problem" placeholder="รายละเอียดงาน / อาการปัญหา"></textarea>
-<input id="contact" class="input" placeholder="เบอร์ติดต่อกลับ">
-
-<button class="btn btn-main" onclick="createJob()">➕ เปิดงาน (รอรับงาน)</button>
+  <button onclick="save()">📨 บันทึกแจ้งงาน</button>
 </div>
 
-<!-- ตารางงาน -->
-<div class="card">
-<h2>📋 งาน IT</h2>
-<table id="jobTable">
-<thead>
-<tr>
-<th>JobID</th>
-<th>ประเภท</th>
-<th>สถานะ</th>
-<th>คำสั่ง</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
-</div>
+<script>
+google.script.run.withSuccessHandler(t=>{
+  jobType.innerHTML='<option value="">เลือกประเภทงาน</option>';
+  t.forEach(r=>{
+    jobType.innerHTML+=`<option value="${r[1]}">${r[1]}</option>`;
+  });
+}).getJobType();
 
-<!-- PHASE 2 : PLACEHOLDER -->
-<div class="card">
-<h2>🚀 Phase 2 (กำลังพัฒนา)</h2>
-<ul>
-<li>Dashboard ภาพรวม</li>
-<li>ระบบผู้ใช้งานหน่วยงาน</li>
-<li>รายงาน & SLA</li>
-<li>Login / Register เต็มรูปแบบ</li>
-</ul>
-</div>
+let subTypeData=[];
+google.script.run.withSuccessHandler(d=>subTypeData=d).getJobSubType();
 
-</div>
+jobType.onchange=()=>{
+  jobSubType.innerHTML='<option value="">เลือกงานย่อย</option>';
+  subTypeData.filter(r=>r[0]==jobType.value)
+    .forEach(r=>{
+      jobSubType.innerHTML+=`<option>${r[2]}</option>`;
+    });
+};
 
-<footer>Phase 1 ใช้งานจริง | Phase 2 เริ่มโครงแล้ว</footer>
-
-<script src="js/api.js"></script>
-<script src="js/main.js"></script>
+function save(){
+  google.script.run.saveJob({
+    jobType:jobType.value,
+    jobSubType:jobSubType.value,
+    detail:detail.value,
+    contact:contact.value,
+    reporter:reporter.value
+  });
+  alert("บันทึกเรียบร้อย");
+}
+</script>
 </body>
 </html>
