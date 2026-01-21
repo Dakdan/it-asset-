@@ -1,36 +1,296 @@
 <!DOCTYPE html>
 <html lang="th">
-<header class="app-header">
-  <div class="header-left">
-    <div class="app-title">
-      ⛑ IT UDH Maintenance & Service
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT UDH Maintenance & Service</title>
+
+<style>
+/* ===== RESET ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", Tahoma, sans-serif; }
+body { background:#f4f6f9; }
+
+/* ===== LAYOUT ===== */
+.wrapper {
+  display: flex;
+  height: 100vh;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 280px;
+  background: #1f2937;
+  color: #fff;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.sidebar .group {
+  font-size: 14px;
+  color: #cbd5e1;
+  margin-bottom: 20px;
+}
+
+.profile {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.profile img {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #38bdf8;
+}
+
+.profile h3 {
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.profile p {
+  font-size: 13px;
+  color: #cbd5e1;
+}
+
+.menu a {
+  display: block;
+  padding: 12px;
+  color: #e5e7eb;
+  text-decoration: none;
+  border-radius: 6px;
+  margin-bottom: 5px;
+}
+
+.menu a:hover,
+.menu a.active {
+  background: #38bdf8;
+  color: #000;
+}
+
+/* ===== MAIN ===== */
+.main {
+  flex: 1;
+  padding: 25px;
+  overflow: auto;
+}
+
+.main h1 {
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
+/* ===== TABLE ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  font-size: 14px;
+}
+
+th {
+  background: #f1f5f9;
+}
+
+.status-open { color: #dc2626; font-weight: bold; }
+.status-progress { color: #f59e0b; font-weight: bold; }
+.status-close { color: #16a34a; font-weight: bold; }
+
+.btn {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-view { background: #38bdf8; }
+.btn-accept { background: #22c55e; }
+.btn-close { background: #ef4444; color:#fff; }
+
+/* ===== MODAL ===== */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: #fff;
+  width: 90%;
+  max-width: 600px;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.modal h2 {
+  margin-bottom: 10px;
+}
+
+.modal .row {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.modal-footer {
+  text-align: right;
+  margin-top: 15px;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: #6b7280;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+  <!-- ===== SIDEBAR ===== -->
+  <div class="sidebar">
+    <h2>⛑ IT UDH Maintenance & Service</h2>
+    <div class="group">กลุ่มงาน: เทคโนโลยีสารสนเทศ</div>
+
+    <div class="profile">
+      <img src="https://i.imgur.com/4Z7X6xA.jpg" alt="profile">
+      <h3>โกวิท กันคำเชิด</h3>
+      <p>ตำแหน่ง: IT Support</p>
     </div>
-    <div class="app-subtitle">
-      กลุ่มงาน: เทคโนโลยีสารสนเทศ
+
+    <div class="menu">
+      <a class="active">📋 รายการงานแจ้งซ่อม</a>
+      <a>📦 ครุภัณฑ์ (รอพัฒนา)</a>
+      <a>📊 รายงาน (รอพัฒนา)</a>
+      <a>⚙️ ตั้งค่า (รอพัฒนา)</a>
     </div>
   </div>
 
-  <div class="user-info">
-    <img id="userAvatar" src="https://i.imgur.com/8Km9tLL.png">
-    <div>
-      <div id="userName">โกวิท กันคำเชิด</div>
-      <div id="userDept">ตำแหน่ง: IT Support</div>
+  <!-- ===== MAIN ===== -->
+  <div class="main">
+    <h1>รายการงานแจ้งซ่อม</h1>
+
+    <table id="jobTable">
+      <thead>
+        <tr>
+          <th>JobID</th>
+          <th>หน่วยงาน</th>
+          <th>ประเภท</th>
+          <th>สถานะ</th>
+          <th>จัดการ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- JS Render -->
+      </tbody>
+    </table>
+
+    <div class="footer">
+      IT Maintenance System © 2026
     </div>
   </div>
-</header>
 
-<main>
-  <section class="card">
-    <h3>📋 รายการงานแจ้งซ่อม</h3>
-    <div id="jobList" class="loading">กำลังโหลดข้อมูล...</div>
-  </section>
-</main>
+</div>
 
-<footer>
-  IT Maintenance System © 2026
-</footer>
+<!-- ===== MODAL ===== -->
+<div class="modal" id="jobModal">
+  <div class="modal-content">
+    <h2>รายละเอียดงานแจ้งซ่อม</h2>
 
-<script src="js/api.js"></script>
-<script src="js/main.js"></script>
+    <div class="row"><b>JobID:</b> <span id="mJobId"></span></div>
+    <div class="row"><b>หน่วยงาน:</b> <span id="mDept"></span></div>
+    <div class="row"><b>ปัญหา:</b> <span id="mDetail"></span></div>
+    <div class="row"><b>สถานะ:</b> <span id="mStatus"></span></div>
+
+    <div class="modal-footer">
+      <button class="btn btn-accept" onclick="acceptJob()">รับงาน</button>
+      <button class="btn btn-close" onclick="closeJob()">ปิดงาน</button>
+      <button class="btn" onclick="closeModal()">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== SAMPLE DATA (แทน API ได้ทันที) =====
+const jobs = [
+  { id:'ITJ-2026-001', dept:'OPD / F2', type:'คอมพิวเตอร์', status:'OPEN', detail:'เครื่องเปิดไม่ติด' },
+  { id:'ITJ-2026-002', dept:'ER / F1', type:'Network', status:'IN PROGRESS', detail:'อินเทอร์เน็ตช้า' }
+];
+
+let currentJob = null;
+
+// ===== RENDER TABLE =====
+function renderTable() {
+  const tbody = document.querySelector('#jobTable tbody');
+  tbody.innerHTML = '';
+
+  if (jobs.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center">ไม่มีงานแจ้งซ่อม</td></tr>`;
+    return;
+  }
+
+  jobs.forEach(job => {
+    const statusClass =
+      job.status === 'OPEN' ? 'status-open' :
+      job.status === 'IN PROGRESS' ? 'status-progress' : 'status-close';
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${job.id}</td>
+        <td>${job.dept}</td>
+        <td>${job.type}</td>
+        <td class="${statusClass}">${job.status}</td>
+        <td><button class="btn btn-view" onclick="viewJob('${job.id}')">ดู</button></td>
+      </tr>
+    `;
+  });
+}
+
+// ===== MODAL =====
+function viewJob(id) {
+  currentJob = jobs.find(j => j.id === id);
+  document.getElementById('mJobId').innerText = currentJob.id;
+  document.getElementById('mDept').innerText = currentJob.dept;
+  document.getElementById('mDetail').innerText = currentJob.detail;
+  document.getElementById('mStatus').innerText = currentJob.status;
+  document.getElementById('jobModal').style.display = 'flex';
+}
+
+function closeModal() {
+  document.getElementById('jobModal').style.display = 'none';
+}
+
+// ===== ACTIONS =====
+function acceptJob() {
+  currentJob.status = 'IN PROGRESS';
+  closeModal();
+  renderTable();
+}
+
+function closeJob() {
+  currentJob.status = 'CLOSE';
+  closeModal();
+  renderTable();
+}
+
+renderTable();
+</script>
+
 </body>
 </html>
