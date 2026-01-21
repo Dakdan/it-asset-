@@ -3,21 +3,20 @@ const jobSub=document.getElementById("jobSubType");
 const table=document.querySelector("#jobTable tbody");
 
 async function loadJobType(){
- jobType.innerHTML="<option>เลือกประเภทงาน</option>";
+ jobType.innerHTML="<option value=''>เลือกประเภทงาน</option>";
  let d=await apiGet("getJobTypes");
  d.forEach(x=>{
   jobType.innerHTML+=`<option value="${x.JobTypeID}">${x.JobTypeName}</option>`;
  });
 }
 async function loadSub(){
- jobSub.innerHTML="<option>เลือกงานย่อย</option>";
+ jobSub.innerHTML="<option value=''>เลือกงานย่อย</option>";
  let d=await apiGet("getJobSubTypes");
  d.filter(x=>x.JobTypeID==jobType.value)
  .forEach(x=>{
   jobSub.innerHTML+=`<option value="${x.SubTypeID}">${x.SubTypeName}</option>`;
  });
 }
-
 jobType.onchange=loadSub;
 
 async function createJob(){
@@ -45,20 +44,16 @@ async function loadJobs(){
    <td>${j.JobType}</td>
    <td class="${s}">${j.Status}</td>
    <td>
-    ${j.Status=="รอรับงาน"?`<button onclick="acceptJob('${j.JobID}')">รับงาน</button>`:""}
-    ${j.Status=="กำลังดำเนินการ"?`<button onclick="closeJob('${j.JobID}')">🔒 ปิดงาน</button>`:""}
+    ${j.Status=="รอรับงาน"
+      ?`<button class="btn-accept" onclick="update('${j.JobID}','กำลังดำเนินการ')">รับงาน</button>`:""}
+    ${j.Status=="กำลังดำเนินการ"
+      ?`<button class="btn-close" onclick="update('${j.JobID}','ดำเนินการแล้วเสร็จ')">🔒 ปิดงาน</button>`:""}
    </td>
   </tr>`;
  });
 }
-
-function acceptJob(id){
- apiPost({action:"updateStatus",jobId:id,status:"กำลังดำเนินการ"})
- .then(loadJobs);
-}
-function closeJob(id){
- apiPost({action:"updateStatus",jobId:id,status:"ดำเนินการแล้วเสร็จ"})
- .then(loadJobs);
+function update(id,status){
+ apiPost({action:"updateStatus",jobId:id,status}).then(loadJobs);
 }
 
 loadJobType();
