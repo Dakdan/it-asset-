@@ -1,41 +1,41 @@
-document.addEventListener("DOMContentLoaded", loadJobs);
+const jobList = document.getElementById("jobList");
+const IT_USER = localStorage.getItem("IT_USER") || prompt("กรุณาใส่ชื่อ IT");
+
+localStorage.setItem("IT_USER", IT_USER);
+
+loadJobs();
 
 async function loadJobs() {
-  const box = document.getElementById("jobList");
-  box.innerHTML = "⏳ กำลังโหลดข้อมูล...";
-
   try {
     const data = await apiGetJobs();
-
-    if (!data.length) {
-      box.innerHTML = "ไม่มีงาน";
-      return;
-    }
-
-    box.innerHTML = "";
-    data.forEach(job => {
-      const div = document.createElement("div");
-      div.className = "job";
-      div.innerHTML = `
-        <b>${job.JobID}</b><br>
-        ประเภท: ${job.JobType || "-"}<br>
-        สถานะ: ${job.Status || "ใหม่"}<br><br>
-        <button onclick="takeJob('${job.JobID}')">รับงาน</button>
-        <button class="close" onclick="closeJob('${job.JobID}')">ปิดงาน</button>
-      `;
-      box.appendChild(div);
-    });
+    renderJobs(data);
   } catch (e) {
-    box.innerHTML = "❌ โหลดข้อมูลไม่สำเร็จ";
+    jobList.innerHTML = "โหลดข้อมูลไม่ได้";
   }
 }
 
-async function takeJob(jobId) {
-  await apiUpdateStatus(jobId, "In Progress");
-  loadJobs();
+function renderJobs(jobs) {
+  if (!jobs.length) {
+    jobList.innerHTML = "ไม่มีงาน";
+    return;
+  }
+
+  jobList.innerHTML = "";
+  jobs.forEach(j => {
+    const div = document.createElement("div");
+    div.className = "job";
+    div.innerHTML = `
+      <b>${j.JobID}</b><br>
+      อุปกรณ์: ${j.AssetName}<br>
+      สถานะ: ${j.Status || "ใหม่"}<br><br>
+      <button onclick="updateJob('${j.JobID}','START')">รับงาน</button>
+      <button onclick="updateJob('${j.JobID}','CLOSE')">ปิดงาน</button>
+    `;
+    jobList.appendChild(div);
+  });
 }
 
-async function closeJob(jobId) {
-  await apiUpdateStatus(jobId, "Closed");
+async function updateJob(jobId, action) {
+  await apiUpdateJob(jobId, action, IT_USER);
   loadJobs();
 }
