@@ -1,65 +1,161 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>IT Dashboard</title>
-<style>
-body{margin:0;font-family:sans-serif;background:#f4f6f9}
-.sidebar{width:260px;background:#1f2937;color:#fff;height:100vh;position:fixed;padding:20px}
-.main{margin-left:260px;padding:20px}
-table{width:100%;background:#fff;border-collapse:collapse}
-th,td{padding:10px;border-bottom:1px solid #ddd}
-th{background:#e5e7eb}
-button{padding:6px 10px;border:none;border-radius:5px;cursor:pointer}
-</style>
-</head>
-<body>
+:root{
+  --pink-1:#ff5fa2;
+  --pink-2:#ff8fc4;
+  --pink-3:#ffd6e9;
+  --white:#ffffff;
+  --text-dark:#3b1d2a;
 
-<div class="sidebar">
-  <h3>⛑ IT UDH Maintenance</h3>
-  <p id="userInfo"></p>
-</div>
-
-<div class="main">
-<h2>📋 งานแจ้งซ่อม</h2>
-<table>
-<thead>
-<tr><th>Job</th><th>หน่วยงาน</th><th>ปัญหา</th><th>สถานะ</th><th>จัดการ</th></tr>
-</thead>
-<tbody id="jobs"></tbody>
-</table>
-</div>
-
-<script>
-const user = JSON.parse(sessionStorage.getItem('user'));
-document.getElementById('userInfo').innerHTML =
-  `${user.name}<br>${user.position}<br>${user.department}`;
-
-google.script.run.withSuccessHandler(render).getJobs();
-
-function render(data){
-  const tb=document.getElementById('jobs');
-  tb.innerHTML='';
-  data.forEach(j=>{
-    tb.innerHTML+=`
-    <tr>
-      <td>${j.jobId}</td>
-      <td>${j.department}</td>
-      <td>${j.detail}</td>
-      <td>${j.status}</td>
-      <td>
-        <button onclick="update('${j.jobId}','IN PROGRESS')">รับ</button>
-        <button onclick="update('${j.jobId}','CLOSE')">ปิด</button>
-      </td>
-    </tr>`;
-  });
+  --open:#ef4444;
+  --progress:#f59e0b;
+  --close:#22c55e;
 }
 
-function update(id,status){
-  google.script.run.withSuccessHandler(()=>location.reload())
-    .updateJob(id,status,user.name);
+/* ===== Global ===== */
+body{
+  margin:0;
+  font-family:"Prompt","Segoe UI",sans-serif;
+  background:linear-gradient(180deg,#ffe4f1,#ffffff);
+  color:var(--text-dark);
 }
-</script>
 
-</body>
-</html>
+/* ===== Header ===== */
+.header{
+  background:linear-gradient(90deg,var(--pink-1),var(--pink-2));
+  color:#fff;
+  padding:14px 18px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  box-shadow:0 4px 10px rgba(0,0,0,.15);
+}
+.header img{
+  height:40px;
+  border-radius:8px;
+  background:#fff;
+}
+.header h2{
+  margin:0;
+  font-size:18px;
+}
+
+/* ===== Layout ===== */
+.container{
+  display:flex;
+  min-height:100vh;
+}
+
+/* ===== Sidebar ===== */
+.sidebar{
+  width:240px;
+  background:linear-gradient(180deg,#fff,#ffe4f1);
+  padding:16px;
+  box-shadow:2px 0 8px rgba(0,0,0,.1);
+}
+
+.profile{
+  text-align:center;
+  margin-bottom:20px;
+}
+.profile img{
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  border:4px solid var(--pink-2);
+  object-fit:cover;
+}
+.profile h4{margin:8px 0 2px}
+.profile small{opacity:.8}
+
+.menu button{
+  width:100%;
+  margin:6px 0;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  background:#fff;
+  box-shadow:0 2px 5px rgba(0,0,0,.1);
+  font-size:15px;
+  cursor:pointer;
+}
+.menu button.active{
+  background:linear-gradient(90deg,var(--pink-1),var(--pink-2));
+  color:#fff;
+}
+
+/* ===== Content ===== */
+.content{
+  flex:1;
+  padding:20px;
+}
+
+/* ===== Table ===== */
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
+  border-radius:14px;
+  overflow:hidden;
+  box-shadow:0 6px 15px rgba(0,0,0,.12);
+}
+th{
+  background:var(--pink-3);
+  padding:12px;
+}
+td{
+  padding:10px;
+  border-bottom:1px solid #f1f1f1;
+}
+
+/* ===== Status ===== */
+.status-open{color:var(--open);font-weight:700}
+.status-progress{color:var(--progress);font-weight:700}
+.status-close{color:var(--close);font-weight:700}
+
+/* ===== Buttons ===== */
+.btn{
+  border:none;
+  padding:8px 14px;
+  border-radius:20px;
+  font-size:14px;
+  cursor:pointer;
+}
+.btn-open{background:var(--open);color:#fff}
+.btn-progress{background:var(--progress);color:#fff}
+.btn-close{background:var(--close);color:#fff}
+.btn-gray{background:#e5e7eb}
+
+/* ===== Modal ===== */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.modal-box{
+  background:#fff;
+  width:90%;
+  max-width:420px;
+  padding:20px;
+  border-radius:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+.modal-box h3{
+  margin-top:0;
+  color:var(--pink-1);
+}
+
+/* ===== Footer ===== */
+footer{
+  text-align:center;
+  padding:10px;
+  font-size:13px;
+  opacity:.7;
+}
+
+/* ===== Mobile ===== */
+@media(max-width:768px){
+  .sidebar{display:none}
+  .header h2{font-size:16px}
+}
