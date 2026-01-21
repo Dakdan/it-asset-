@@ -2,58 +2,22 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <title>IT Job Center</title>
+  <title>ระบบงานแจ้งซ่อม IT</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg,#ffd6e8,#ffffff);
-    }
-    header {
-      background: #ff4f9a;
-      color: white;
-      padding: 15px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    header img {
-      height: 40px;
-    }
-    h1 {
-      font-size: 20px;
-      margin: 0;
-    }
-    .container {
-      padding: 15px;
-    }
-    .job {
-      background: white;
-      border-radius: 10px;
-      padding: 12px;
-      margin-bottom: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .job button {
-      background: #ff4f9a;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .job button.close {
-      background: #4caf50;
-    }
+    body { font-family: sans-serif; margin:0; background:#ffe6f0; }
+    header { background:#ff5fa2; color:#fff; padding:12px; display:flex; align-items:center; gap:10px; }
+    header img { height:40px; }
+    .container { padding:15px; }
+    .job { background:#fff; border-radius:8px; padding:10px; margin-bottom:10px; }
+    button { padding:6px 10px; margin-right:5px; }
   </style>
 </head>
-
 <body>
+
 <header>
-  <img src="https://img2.pic.in.th/-227e4f6f84f29f020.png">
-  <h1>ระบบงานแจ้งซ่อม IT</h1>
+  <img src="โรงพยาบาลอุดรธานี.png">
+  <h3>ระบบงานแจ้งซ่อม IT</h3>
 </header>
 
 <div class="container">
@@ -61,7 +25,7 @@
   <div id="jobList">กำลังโหลด...</div>
 </div>
 
-<script src="js/api.js"></script>
-<script src="js/main.js"></script>
+<script src="./js/api.js"></script>
+<script src="./js/main.js"></script>
 </body>
 </html>
