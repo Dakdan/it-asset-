@@ -1,18 +1,65 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>IT งานซ่อม</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
+  <meta charset="UTF-8" />
+  <title>IT Job Center</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<header class="header">
-  🔧 IT งานซ่อม
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg,#ffd6e8,#ffffff);
+    }
+    header {
+      background: #ff4f9a;
+      color: white;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    header img {
+      height: 40px;
+    }
+    h1 {
+      font-size: 20px;
+      margin: 0;
+    }
+    .container {
+      padding: 15px;
+    }
+    .job {
+      background: white;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .job button {
+      background: #ff4f9a;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .job button.close {
+      background: #4caf50;
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <img src="https://img2.pic.in.th/-227e4f6f84f29f020.png">
+  <h1>ระบบงานแจ้งซ่อม IT</h1>
 </header>
 
-<div id="jobList"></div>
+<div class="container">
+  <h3>📋 งานทั้งหมด</h3>
+  <div id="jobList">กำลังโหลด...</div>
+</div>
 
 <script src="js/api.js"></script>
 <script src="js/main.js"></script>
