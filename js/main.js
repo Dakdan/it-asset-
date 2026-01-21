@@ -1,47 +1,23 @@
-const jobList = document.getElementById("jobList");
+document.addEventListener("DOMContentLoaded", async () => {
+  const jobTypeSelect = document.getElementById("jobType");
+  const jobSubTypeSelect = document.getElementById("jobSubType");
 
-// LOGIN ครั้งแรก
-let IT_USER = localStorage.getItem("IT_USER");
-if (!IT_USER) {
-  IT_USER = prompt("กรุณาใส่ชื่อเจ้าหน้าที่ IT");
-  localStorage.setItem("IT_USER", IT_USER);
-}
+  const jobTypes = await fetchJobTypes();
+  jobTypeSelect.innerHTML = `<option value="">เลือกประเภทงาน</option>`;
 
-loadJobs();
-
-async function loadJobs() {
-  try {
-    const jobs = await apiGetJobs();
-    renderJobs(jobs);
-  } catch (err) {
-    jobList.innerHTML = "❌ โหลดข้อมูลไม่สำเร็จ";
-  }
-}
-
-function renderJobs(jobs) {
-  if (!jobs.length) {
-    jobList.innerHTML = "ไม่มีงานแจ้งซ่อม";
-    return;
-  }
-
-  jobList.innerHTML = "";
-  jobs.forEach(j => {
-    const div = document.createElement("div");
-    div.className = "job";
-
-    div.innerHTML = `
-      <b>${j.JobID}</b><br>
-      อุปกรณ์: ${j.AssetName || "-"}<br>
-      สถานะ: <span class="status">${j.Status || "NEW"}</span><br><br>
-      <button class="btn-start" onclick="updateJob('${j.JobID}','START')">รับงาน</button>
-      <button class="btn-close" onclick="updateJob('${j.JobID}','CLOSE')">ปิดงาน</button>
-    `;
-
-    jobList.appendChild(div);
+  jobTypes.forEach(j => {
+    jobTypeSelect.innerHTML += `<option value="${j.code}">${j.name}</option>`;
   });
-}
 
-async function updateJob(jobId, action) {
-  await apiUpdateJob(jobId, action, IT_USER);
-  loadJobs();
-}
+  jobTypeSelect.addEventListener("change", async () => {
+    const code = jobTypeSelect.value;
+    jobSubTypeSelect.innerHTML = `<option value="">เลือกงานย่อย</option>`;
+
+    if (!code) return;
+
+    const subs = await fetchJobSubTypes(code);
+    subs.forEach(s => {
+      jobSubTypeSelect.innerHTML += `<option value="${s.code}">${s.name}</option>`;
+    });
+  });
+});
