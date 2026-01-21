@@ -79,3 +79,21 @@ footer {
   color: #666;
   padding: 10px;
 }
+.app-header {
+  background: linear-gradient(135deg, #ff5fa2, #ffc1d9);
+  color: white;
+  padding: 12px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.app-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.app-subtitle {
+  font-size: 14px;
+  opacity: 0.9;
+}
