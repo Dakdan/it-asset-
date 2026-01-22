@@ -3,59 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ลงทะเบียน IT - โรงพยาบาลอุดรธานี</title>
-    <link rel="stylesheet" href="style.css?v=99">
+    <title>Register - IT Udon Hospital</title>
+    <link rel="stylesheet" href="style.css?v=2.0">
 </head>
 <body>
 
-    <div id="loader" class="loader-overlay">
-        <div class="spinner"></div>
-    </div>
+    <div id="loader" class="loader-overlay"><div class="spinner"></div></div>
 
     <div class="login-wrapper">
         <div class="login-header">
-            <img src="https://img2.pic.in.th/-227e4f6f84f29f020.png" class="header-logo" alt="Logo">
+            <img src="https://img2.pic.in.th/-227e4f6f84f29f020.png" class="header-logo">
             <div class="header-text">
                 <h1>โรงพยาบาลอุดรธานี</h1>
-                <p>ระบบแจ้งซ่อมบำรุง IT (เจ้าหน้าที่)</p>
+                <p>✨ ระบบลงทะเบียนเจ้าหน้าที่ IT</p>
             </div>
         </div>
 
         <div class="login-card">
-            <h2 style="color:#ff0080; margin-bottom: 20px; text-align: center;">📝 ลงทะเบียนใหม่</h2>
+            <h2 style="color:var(--primary-pink); margin-bottom: 20px;">📝 ลงทะเบียนสมาชิกใหม่</h2>
             
             <div class="form-group">
-                <label>ชื่อ-นามสกุล</label>
-                <input type="text" id="reg_name" placeholder="ระบุชื่อจริง">
+                <label>👤 Username (ชื่อผู้ใช้งาน)</label>
+                <input type="text" id="reg_username" placeholder="ระบุไอดีที่ต้องการ">
             </div>
 
             <div class="form-group">
-                <label>Email / Username</label>
-                <input type="email" id="reg_email" placeholder="example@mail.com">
+                <label>📛 ชื่อ-นามสกุล</label>
+                <input type="text" id="reg_name" placeholder="ชื่อจริงของคุณ">
             </div>
 
             <div class="form-group">
-                <label>รหัสผ่าน</label>
-                <input type="password" id="reg_password" placeholder="ระบุรหัสผ่าน">
+                <label>🔑 รหัสผ่าน</label>
+                <input type="password" id="reg_password" placeholder="ตั้งรหัสผ่าน">
             </div>
 
             <div class="form-group">
-                <label>ตำแหน่งงาน</label>
+                <label>🛠️ ตำแหน่งงาน</label>
                 <select id="reg_position">
                     <option value="">-- เลือกตำแหน่ง --</option>
-                    <option value="หัวหน้างาน IT">หัวหน้างาน IT</option>
-                    <option value="นักวิชาการคอมพิวเตอร์">นักวิชาการคอมพิวเตอร์</option>
-                    <option value="ช่างเทคนิคคอมพิวเตอร์">ช่างเทคนิคคอมพิวเตอร์</option>
-                    <option value="เจ้าหน้าที่ธุรการ">เจ้าหน้าที่ธุรการ</option>
+                    <option value="หัวหน้างาน IT">💼 หัวหน้างาน IT</option>
+                    <option value="นักวิชาการคอมพิวเตอร์">💻 นักวิชาการคอมพิวเตอร์</option>
+                    <option value="ช่างเทคนิคคอมพิวเตอร์">🔧 ช่างเทคนิคคอมพิวเตอร์</option>
+                    <option value="เจ้าหน้าที่ธุรการ">📑 เจ้าหน้าที่ธุรการ</option>
                 </select>
             </div>
 
-            <button onclick="handleRegister()" class="btn-login" id="btnReg">
-                ยืนยันการลงทะเบียน
-            </button>
+            <button onclick="handleRegister()" class="btn-login" id="submitBtn">✅ ยืนยันลงทะเบียน</button>
 
             <button type="button" onclick="window.location.replace('login.html')" class="btn-back">
-                ⬅️ กลับหน้า Login
+                🔙 กลับหน้าเข้าสู่ระบบ
             </button>
         </div>
     </div>
@@ -63,39 +59,27 @@
     <script src="js/main.js"></script>
     <script>
         async function handleRegister() {
-            const btn = document.getElementById('btnReg');
-            const payload = {
+            const data = {
                 action: 'registerIT',
+                email: document.getElementById('reg_username').value,
                 name: document.getElementById('reg_name').value,
-                email: document.getElementById('reg_email').value,
                 password: document.getElementById('reg_password').value,
                 position: document.getElementById('reg_position').value
             };
-            
-            if(!payload.name || !payload.email || !payload.password || !payload.position) {
-                return alert("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+
+            if(!data.email || !data.name || !data.password || !data.position) {
+                return alert("⚠️ กรุณากรอกข้อมูลให้ครบทุกช่องนะครับ");
             }
 
-            // แสดง Spinner และล็อกปุ่ม
             document.getElementById('loader').style.display = 'flex';
-            btn.disabled = true;
-            btn.innerText = "กำลังบันทึก...";
-
             try {
-                const res = await apiRequest(payload, 'POST');
+                const res = await apiRequest(data, 'POST');
                 if (res.success) {
-                    alert("ลงทะเบียนเรียบร้อยแล้ว! กรุณารอหัวหน้าอนุมัติสิทธิ์การใช้งาน");
+                    alert("🎉 ลงทะเบียนสำเร็จ! กรุณารอหัวหน้าอนุมัติสิทธิ์นะครับ");
                     window.location.replace('login.html');
-                } else {
-                    alert("ไม่สามารถลงทะเบียนได้: " + (res.error || "ลองใหม่อีกครั้ง"));
                 }
-            } catch (e) { 
-                alert("การเชื่อมต่อล้มเหลว"); 
-            } finally { 
-                document.getElementById('loader').style.display = 'none';
-                btn.disabled = false;
-                btn.innerText = "ยืนยันการลงทะเบียน";
-            }
+            } catch (e) { alert("❌ ระบบขัดข้อง กรุณาลองใหม่ครับ"); }
+            finally { document.getElementById('loader').style.display = 'none'; }
         }
     </script>
 </body>
