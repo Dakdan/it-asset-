@@ -2,46 +2,102 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>IT Maintenance System - สำหรับช่าง</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Service Management - สำหรับเจ้าหน้าที่ IT</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
+
+    <div id="loader" class="loader-overlay">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <p>กำลังประมวลผล...</p>
+        </div>
+    </div>
+
     <nav>
-        <span>ผู้ใช้งาน: <b id="staffName"></b></span>
-        <button onclick="localStorage.clear(); location.href='login.html';">Logout</button>
+        <div class="nav-container">
+            <div class="brand">
+                <img src="https://img2.pic.in.th/-227e4f6f84f29f020.png" alt="LOGO" class="logo">
+                <span class="brand-text">IT MAINTENANCE</span>
+            </div>
+            <div class="user-info">
+                <span id="staffName">กำลังโหลด...</span>
+                <button onclick="logout()" class="btn-logout">ออกจากระบบ</button>
+            </div>
+        </div>
     </nav>
 
     <div class="container">
-        <h2>สร้างใบงานซ่อมบำรุง (IT Only)</h2>
-        
+        <div class="header-section">
+            <h2>สร้างใบงานซ่อมบำรุง / มอบหมายงาน</h2>
+            <p>บันทึกรายละเอียดงานจากทุกช่องทาง (โทรศัพท์, บันทึกข้อความ, ระบบอื่นๆ)</p>
+        </div>
+
         <div class="card">
-            <label>ประเภทงาน (Standard):</label>
-            <select id="jobType">
-                <option value="คอมพิวเตอร์">คอมพิวเตอร์</option>
-                <option value="เครือข่าย">เครือข่าย</option>
-            </select>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>ประเภทงาน (Master):</label>
+                    <select id="jobType">
+                        <option value="">-- เลือกประเภทงาน --</option>
+                        <option value="คอมพิวเตอร์">คอมพิวเตอร์</option>
+                        <option value="เครือข่าย">เครือข่าย</option>
+                        <option value="ซอฟต์แวร์">ซอฟต์แวร์</option>
+                    </select>
+                </div>
 
-            <label>ครุภัณฑ์ (จาก BackupData):</label>
-            <select id="assetID">
-                <option value="">-- เลือกครุภัณฑ์ --</option>
-            </select>
+                <div class="form-group">
+                    <label>ครุภัณฑ์ (Asset ID):</label>
+                    <select id="assetID">
+                        <option value="">-- เลือกจากฐานข้อมูล BackupData --</option>
+                    </select>
+                </div>
 
-            <label>เลขที่บันทึกข้อความ:</label>
-            <input type="text" id="docNumber" placeholder="ระบุเลขที่บันทึก (ถ้ามี)">
+                <div class="form-group">
+                    <label>เลขที่บันทึกข้อความ:</label>
+                    <input type="text" id="docNumber" placeholder="เช่น บันทึกเลขที่ 123/2567">
+                </div>
 
-            <label>ผู้มอบหมาย:</label>
-            <input type="text" id="assignBy" placeholder="ระบุชื่อผู้สั่งการ">
+                <div class="form-group">
+                    <label>ผู้มอบหมาย / สั่งการ:</label>
+                    <input type="text" id="assignBy" placeholder="ระบุชื่อผู้มอบหมายงาน">
+                </div>
+            </div>
 
-            <label>แนบไฟล์บันทึกข้อความ (PDF/รูป):</label>
-            <input type="file" id="docFile" accept=".pdf,image/*">
+            <div class="form-group">
+                <label>รายละเอียดปัญหา/ความต้องการ:</label>
+                <textarea id="detail" rows="3" placeholder="ระบุรายละเอียดเพิ่มเติม..."></textarea>
+            </div>
 
-            <label>ถ่ายรูปงานซ่อม/หน้างาน:</label>
-            <input type="file" id="repairPhoto" accept="image/*" capture="camera">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>แนบไฟล์เอกสารบันทึก (PDF/Image):</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="docFile" accept=".pdf,image/*">
+                    </div>
+                </div>
 
-            <button id="btnSubmit" onclick="submitJob()" class="btn-primary">บันทึกข้อมูล</button>
+                <div class="form-group">
+                    <label>รูปภาพหน้างาน / งานซ่อม:</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="repairPhoto" accept="image/*" capture="camera">
+                    </div>
+                </div>
+            </div>
+
+            <button id="btnSubmit" onclick="submitJob()" class="btn-primary">
+                บันทึกข้อมูลและเปิดใบงาน
+            </button>
         </div>
     </div>
 
     <script src="js/main.js"></script>
+    <script>
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+    </script>
 </body>
 </html>
