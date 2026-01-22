@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - IT Udon Hospital</title>
-    <link rel="stylesheet" href="style.css?v=2.0">
+    <title>ลงทะเบียนเจ้าหน้าที่ - IT Udon Hospital</title>
+    <link rel="stylesheet" href="style.css?v=4.0">
 </head>
 <body>
 
@@ -15,72 +15,73 @@
             <img src="https://img2.pic.in.th/-227e4f6f84f29f020.png" class="header-logo">
             <div class="header-text">
                 <h1>โรงพยาบาลอุดรธานี</h1>
-                <p>✨ ระบบลงทะเบียนเจ้าหน้าที่ IT</p>
+                <p>📧 ลงทะเบียนและยืนยันผ่านอีเมล</p>
             </div>
         </div>
 
-        <div class="login-card">
-            <h2 style="color:var(--primary-pink); margin-bottom: 20px;">📝 ลงทะเบียนสมาชิกใหม่</h2>
-            
+        <div class="login-card" id="regForm">
+            <h2 style="color:var(--primary-pink); margin-bottom: 25px;">🖋️ ลงทะเบียนสมาชิก</h2>
             <div class="form-group">
-                <label>👤 Username (ชื่อผู้ใช้งาน)</label>
-                <input type="text" id="reg_username" placeholder="ระบุไอดีที่ต้องการ">
+                <label>🆔 Username</label>
+                <input type="text" id="reg_username" placeholder="ไอดีล็อกอิน">
             </div>
-
             <div class="form-group">
-                <label>📛 ชื่อ-นามสกุล</label>
-                <input type="text" id="reg_name" placeholder="ชื่อจริงของคุณ">
+                <label>📧 Email (สำหรับรับรหัสยืนยัน)</label>
+                <input type="email" id="reg_email" placeholder="ต้องเป็นเมลที่ใช้งานได้จริง">
             </div>
-
             <div class="form-group">
-                <label>🔑 รหัสผ่าน</label>
-                <input type="password" id="reg_password" placeholder="ตั้งรหัสผ่าน">
+                <label>👤 ชื่อ-นามสกุล</label>
+                <input type="text" id="reg_name" placeholder="ชื่อจริง-นามสกุล">
             </div>
-
             <div class="form-group">
-                <label>🛠️ ตำแหน่งงาน</label>
+                <label>🔐 รหัสผ่าน</label>
+                <input type="password" id="reg_password" placeholder="รหัสผ่าน 6 ตัวขึ้นไป">
+            </div>
+            <div class="form-group">
+                <label>🏢 ตำแหน่ง</label>
                 <select id="reg_position">
                     <option value="">-- เลือกตำแหน่ง --</option>
                     <option value="หัวหน้างาน IT">💼 หัวหน้างาน IT</option>
                     <option value="นักวิชาการคอมพิวเตอร์">💻 นักวิชาการคอมพิวเตอร์</option>
                     <option value="ช่างเทคนิคคอมพิวเตอร์">🔧 ช่างเทคนิคคอมพิวเตอร์</option>
-                    <option value="เจ้าหน้าที่ธุรการ">📑 เจ้าหน้าที่ธุรการ</option>
                 </select>
             </div>
+            <button onclick="sendOTP()" class="btn-login" id="btnSend">📩 ส่งรหัสยืนยันไปที่เมล</button>
+            <button type="button" onclick="window.location.replace('login.html')" class="btn-back">⬅️ กลับหน้าล็อกอิน</button>
+        </div>
 
-            <button onclick="handleRegister()" class="btn-login" id="submitBtn">✅ ยืนยันลงทะเบียน</button>
-
-            <button type="button" onclick="window.location.replace('login.html')" class="btn-back">
-                🔙 กลับหน้าเข้าสู่ระบบ
-            </button>
+        <div class="login-card" id="otpForm" style="display: none;">
+            <h2 style="color:var(--primary-pink); margin-bottom: 20px;">🔐 ยืนยันรหัสผ่าน</h2>
+            <p style="font-size: 0.9rem; margin-bottom: 20px; color: #666;">เราได้ส่งรหัส 6 หลักไปที่ <br><b id="displayEmail"></b></p>
+            <div class="form-group">
+                <input type="text" id="input_otp" placeholder="กรอกรหัส 6 หลัก" style="text-align: center; font-size: 1.5rem; letter-spacing: 5px;">
+            </div>
+            <button onclick="verifyAndRegister()" class="btn-login">✅ ยืนยันและลงทะเบียน</button>
+            <button type="button" onclick="location.reload()" class="btn-back">🔄 แก้ไขข้อมูล/ส่งใหม่</button>
         </div>
     </div>
 
     <script src="js/main.js"></script>
     <script>
-        async function handleRegister() {
-            const data = {
-                action: 'registerIT',
-                email: document.getElementById('reg_username').value,
-                name: document.getElementById('reg_name').value,
-                password: document.getElementById('reg_password').value,
-                position: document.getElementById('reg_position').value
-            };
+        let generatedOTP = ""; 
 
-            if(!data.email || !data.name || !data.password || !data.position) {
-                return alert("⚠️ กรุณากรอกข้อมูลให้ครบทุกช่องนะครับ");
-            }
+        async function sendOTP() {
+            const email = document.getElementById('reg_email').value;
+            if(!email.includes('@')) return alert("⚠️ กรุณากรอกอีเมลให้ถูกต้อง");
 
             document.getElementById('loader').style.display = 'flex';
             try {
-                const res = await apiRequest(data, 'POST');
+                // สั่งให้ Server ส่งเมล
+                const res = await apiRequest({ action: 'sendOTP', email: email }, 'POST');
                 if (res.success) {
-                    alert("🎉 ลงทะเบียนสำเร็จ! กรุณารอหัวหน้าอนุมัติสิทธิ์นะครับ");
-                    window.location.replace('login.html');
+                    generatedOTP = res.otp; // รับ OTP (ชั่วคราว) มาเทียบ หรือให้ Server เช็คก็ได้
+                    document.getElementById('displayEmail').innerText = email;
+                    document.getElementById('regForm').style.display = 'none';
+                    document.getElementById('otpForm').style.display = 'block';
                 }
-            } catch (e) { alert("❌ ระบบขัดข้อง กรุณาลองใหม่ครับ"); }
+            } catch (e) { alert("❌ ส่งเมลไม่สำเร็จ"); }
             finally { document.getElementById('loader').style.display = 'none'; }
         }
-    </script>
-</body>
-</html>
+
+        async function verifyAndRegister() {
+            const inputOtp = document.getElementById('input_otp
