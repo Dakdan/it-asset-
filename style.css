@@ -1,110 +1,87 @@
-/* บังคับล้างค่าเริ่มต้นทั้งหมด */
+/* --- 1. Global Setup --- */
 @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap');
 
+:root {
+    --primary-pink: #ff0080;
+    --dark-pink: #800040;
+    --neon-pink: #ff00ff;
+    --neon-green: #00ff00;
+    --bg-pink: #fce4ec;
+}
+
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+    margin: 0; padding: 0; box-sizing: border-box;
     font-family: 'Kanit', sans-serif !important;
 }
 
-/* 1. บังคับพื้นหลังชมพูอ่อนทั่วทั้งหน้าจอ */
+/* บังคับพื้นหลังทุกหน้า */
 html, body {
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 100vh !important;
-    background-color: #fce4ec !important; /* ชมพูพื้นหลัง */
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
+    width: 100%; min-height: 100vh;
+    background-color: var(--bg-pink) !important;
+    display: flex; justify-content: center; align-items: center;
 }
 
-/* 2. ตัวคุมกล่องให้อยู่ตรงกลาง */
+/* --- 2. Shared UI (Login & Register) --- */
 .login-wrapper {
-    width: 100% !important;
-    max-width: 420px !important;
-    padding: 15px !important;
-    z-index: 10 !important;
+    width: 100%; max-width: 420px; padding: 15px;
 }
 
-/* 3. หัว Header ชมพูเข้มไล่เฉดตามรูป */
 .login-header {
-    background: linear-gradient(180deg, #800040 0%, #ff0080 100%) !important;
-    padding: 20px !important;
-    border-radius: 20px 20px 0 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 15px !important;
-    color: white !important;
-    border: 2px solid #000 !important;
+    background: linear-gradient(180deg, var(--dark-pink) 0%, var(--primary-pink) 100%);
+    padding: 20px; border-radius: 20px 20px 0 0;
+    display: flex; align-items: center; gap: 15px;
+    color: #fff; border: 2px solid #000;
 }
 
 .header-logo {
-    width: 60px !important;
-    height: 60px !important;
-    background: white !important;
-    border-radius: 50% !important;
-    padding: 5px !important;
-    object-fit: contain !important;
+    width: 60px; height: 60px; background: #fff;
+    border-radius: 50%; padding: 5px; object-fit: contain;
 }
 
-.header-text h1 { font-size: 1.1rem !important; margin: 0 !important; }
-.header-text p { font-size: 0.75rem !important; margin: 0 !important; font-weight: 300 !important; }
-
-/* 4. กล่องสีขาว (Card) บังคับขึ้นแน่นอน */
 .login-card {
-    background-color: #ffffff !important;
-    padding: 30px !important;
-    border-radius: 0 0 20px 20px !important;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important;
-    border: 2px solid #000 !important;
-    border-top: none !important;
-    text-align: center !important;
+    background-color: #fff !important;
+    padding: 30px; border-radius: 0 0 20px 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    border: 2px solid #000; border-top: none;
 }
 
-/* 5. ช่องกรอกข้อมูล ขอบชมพูสะท้อนแสง */
-.form-group { margin-bottom: 15px !important; text-align: left !important; }
-label { display: block !important; margin-bottom: 5px !important; color: #333 !important; font-size: 0.9rem !important; }
+/* --- 3. Form Elements --- */
+.form-group { margin-bottom: 15px; text-align: left; }
+label { display: block; margin-bottom: 5px; color: #333; font-size: 0.9rem; }
 
 input, select {
-    width: 100% !important;
-    padding: 12px 15px !important;
-    border: 2px solid #ff00ff !important; /* ชมพูสะท้อนแสง */
-    border-radius: 12px !important;
-    font-size: 1rem !important;
-    outline: none !important;
-    background: #fff !important;
+    width: 100%; padding: 12px 15px;
+    border: 2px solid var(--neon-pink);
+    border-radius: 12px; font-size: 1rem; outline: none;
 }
 
-/* 6. ปุ่มชมพู ขอบเขียวสะท้อนแสง */
 .btn-login {
-    width: 100% !important;
-    background-color: #ff0080 !important;
-    color: white !important;
-    border: 2px solid #00ff00 !important; /* เขียวสะท้อนแสง */
-    padding: 12px !important;
-    border-radius: 12px !important;
-    font-size: 1.2rem !important;
-    font-weight: 500 !important;
-    cursor: pointer !important;
-    margin-top: 10px !important;
+    width: 100%; background-color: var(--primary-pink);
+    color: #fff; border: 2px solid var(--neon-green);
+    padding: 12px; border-radius: 12px;
+    font-size: 1.2rem; font-weight: 500; cursor: pointer;
+    margin-top: 10px; transition: 0.2s;
 }
 
-/* ปุ่มกลับหน้าหลัก */
+.btn-login:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
 .btn-back {
-    background: none !important;
-    border: none !important;
-    color: #0000EE !important;
-    text-decoration: underline !important;
-    cursor: pointer !important;
-    margin-top: 15px !important;
-    font-size: 0.95rem !important;
+    background: none; border: none; color: #0000EE;
+    text-decoration: underline; cursor: pointer;
+    margin-top: 15px; font-size: 0.95rem; width: 100%;
 }
 
-/* Loader */
+/* --- 4. Utilities --- */
 .loader-overlay {
-    position: fixed !important; top: 0 !important; left: 0 !important; 
-    width: 100% !important; height: 100% !important;
-    background: rgba(255,255,255,0.9) !important; display: none;
-    justify-content: center !important; align-items: center !important; z-index: 9999 !important;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255,255,255,0.9); display: none;
+    justify-content: center; align-items: center; z-index: 9999;
 }
+
+.spinner {
+    width: 40px; height: 40px;
+    border: 4px solid #f3f3f3; border-top: 4px solid var(--primary-pink);
+    border-radius: 50%; animation: spin 1s linear infinite;
+}
+
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
