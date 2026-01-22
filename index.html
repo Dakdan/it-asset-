@@ -1,120 +1,139 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>IT Service Desk</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background: #f4f6f8;
-    }
-    header {
-      background: #003366;
-      color: #fff;
-      padding: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    header img {
-      height: 40px;
-    }
-    .container {
-      padding: 15px;
-    }
-    .card {
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
-    button {
-      padding: 6px 10px;
-      cursor: pointer;
-    }
-    .hidden {
-      display: none;
-    }
-  </style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{font-family:Arial;background:#f4f4f4;margin:0}
+header{background:#8b004f;color:#fff;padding:10px}
+.card{background:#fff;margin:10px;padding:15px;border-radius:8px}
+button{padding:8px 12px;border:none;border-radius:6px;cursor:pointer}
+.btn{background:#8b004f;color:#fff}
+.top{background:#fff2f7}
+</style>
 </head>
 
 <body>
 
+<header>
+  <b id="itInfo"></b>
+</header>
+
 <!-- LOGIN -->
-<div id="loginBox" class="container">
+<div class="card" id="loginBox">
   <h3>IT Login</h3>
   <input id="email" placeholder="Email"><br><br>
   <input id="password" type="password" placeholder="Password"><br><br>
-  <button onclick="login()">Login</button>
-  <div id="loginError" style="color:red"></div>
+  <button class="btn" onclick="login()">Login</button>
 </div>
 
-<!-- MAIN -->
-<div id="mainApp" class="hidden">
+<!-- DASHBOARD -->
+<div id="dashboard" style="display:none">
 
-<header>
-  <img src="https://upload.wikimedia.org/wikipedia/commons/a/ab/Logo_TV_2015.png">
-  <div>
-    <div id="itName"></div>
-    <div id="itPosition"></div>
+  <!-- WORKING JOB -->
+  <div class="card top">
+    <h3>🔧 งานที่กำลังดำเนินการ</h3>
+    <div id="workingList"></div>
   </div>
-</header>
 
-<div class="container">
-  <h3>รายการงาน IT</h3>
-  <div id="ticketList"></div>
-</div>
+  <!-- ALL JOB -->
+  <div class="card">
+    <h3>📋 งานทั้งหมด</h3>
+    <div id="ticketList"></div>
+  </div>
+
+  <!-- APP LINK -->
+  <div class="card">
+    <h3>🔗 ระบบอื่น</h3>
+    <button onclick="openApp('ASSET')">Asset App</button>
+    <button onclick="openApp('SERVICE')">Service App</button>
+  </div>
 
 </div>
 
 <script>
-let currentUser = null;
+let IT=null;
 
-function login() {
-  google.script.run.withSuccessHandler(res => {
-    if (!res.success) {
-      document.getElementById('loginError').innerText = 'Login ไม่ถูกต้อง';
-      return;
-    }
-    currentUser = res.user;
-    document.getElementById('loginBox').classList.add('hidden');
-    document.getElementById('mainApp').classList.remove('hidden');
-    document.getElementById('itName').innerText = res.user.name;
-    document.getElementById('itPosition').innerText = res.user.position;
-    loadTickets();
+// ---------- LOGIN ----------
+function login(){
+  google.script.run.withSuccessHandler(res=>{
+    if(res.status==='success'){
+      IT=res.it;
+      localStorage.setItem('it',JSON.stringify(IT));
+      showDashboard();
+    }else alert('Login failed');
   }).itLogin(
-    document.getElementById('email').value,
-    document.getElementById('password').value
+    email.value,password.value
   );
 }
 
-function loadTickets() {
-  google.script.run.withSuccessHandler(data => {
-    const box = document.getElementById('ticketList');
-    box.innerHTML = '';
-    data.forEach(t => {
-      const div = document.createElement('div');
-      div.className = 'card';
-      div.innerHTML = `
-        <b>${t.JobID}</b><br>
-        หน่วยงาน: ${t.Department}<br>
-        ปัญหา: ${t.Problem}<br>
-        สถานะ: ${t.Status}<br><br>
-        <button onclick="takeJob('${t.JobID}')">รับงาน</button>
-      `;
-      box.appendChild(div);
+function showDashboard(){
+  loginBox.style.display='none';
+  dashboard.style.display='block';
+  itInfo.innerText = IT.name + ' | ' + IT.position;
+  loadWorking();
+  loadTickets();
+}
+
+// ---------- WORKING ----------
+function loadWorking(){
+  google.script.run.withSuccessHandler(data=>{
+    let html='';
+    if(data.length===0) html='ไม่มีงาน';
+    data.forEach(r=>{
+      html+=`
+        <div class="card">
+          <b>${r[0]}</b><br>
+          ${r[6]}<br>
+          <button onclick="closeJob('${r[0]}')">ปิดงาน</button>
+        </div>`;
     });
+    workingList.innerHTML=html;
+  }).getMyWorkingJobs(IT.id);
+}
+
+// ---------- ALL ----------
+function loadTickets(){
+  google.script.run.withSuccessHandler(data=>{
+    let html='';
+    data.forEach(r=>{
+      html+=`
+        <div class="card">
+          <b>${r[0]}</b><br>
+          ${r[6]}<br>
+          สถานะ: ${r[8]}<br>
+          <button onclick="assign('${r[0]}')">รับงาน</button>
+        </div>`;
+    });
+    ticketList.innerHTML=html;
   }).getTickets();
 }
 
-function takeJob(jobId) {
-  google.script.run.withSuccessHandler(() => {
-    loadTickets();
-  }).updateTicketStatus(jobId, 'IN_PROGRESS', currentUser.name);
+// ---------- ACTION ----------
+function assign(id){
+  google.script.run.withSuccessHandler(()=>{
+    loadWorking();loadTickets();
+  }).assignTicket(id,IT.id);
+}
+
+function closeJob(id){
+  google.script.run.withSuccessHandler(()=>{
+    loadWorking();loadTickets();
+  }).closeTicket(id);
+}
+
+// ---------- LINK APP ----------
+function openApp(app){
+  const base={
+    ASSET:'https://asset-app-url',
+    SERVICE:'https://service-app-url'
+  };
+  window.open(`${base[app]}?it=${IT.id}`,'_blank');
+}
+
+// auto login
+window.onload=()=>{
+  const s=localStorage.getItem('it');
+  if(s){IT=JSON.parse(s);showDashboard();}
 }
 </script>
 
