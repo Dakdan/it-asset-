@@ -1,35 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>Login</title>
+<title>IT Login</title>
+<link rel="stylesheet" href="style.css">
 <style>
-body{background:#0f172a;color:#fff;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh}
-.box{background:#1e293b;padding:30px;border-radius:10px;width:320px}
-input,button{width:100%;padding:10px;margin-top:10px;border-radius:6px;border:none}
-button{background:#38bdf8;font-weight:bold}
+body{
+  background:#0f172a;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+.login-box{
+  background:#1e293b;
+  padding:30px;
+  border-radius:12px;
+  width:340px;
+  color:#fff;
+}
+.login-box h2{text-align:center}
+input,button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:8px;
+  border:none;
+}
+button{
+  background:#38bdf8;
+  font-weight:bold;
+  cursor:pointer;
+}
+.error{color:#f87171;margin-top:10px;text-align:center}
 </style>
 </head>
 <body>
 
-<div class="box">
-<h2>🔐 IT Maintenance</h2>
-<input id="user" placeholder="Username">
-<input id="pass" type="password" placeholder="Password">
-<button onclick="login()">เข้าสู่ระบบ</button>
-<p id="msg"></p>
+<div class="login-box">
+  <h2>🔐 IT Maintenance</h2>
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <div id="msg" class="error"></div>
 </div>
 
+<script src="js/api.js"></script>
 <script>
-function login(){
-  google.script.run.withSuccessHandler(res=>{
-    if(res.success){
-      sessionStorage.setItem('user', JSON.stringify(res));
-      window.location = '?page=index';
-    }else{
-      document.getElementById('msg').innerText='❌ ไม่ถูกต้อง';
-    }
-  }).login(user.value, pass.value);
+async function login(){
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  const res = await apiPost({
+    action:"loginIT",
+    email,
+    password
+  });
+
+  if(res.success){
+    localStorage.setItem("it_user", JSON.stringify(res));
+    location.href = "index.html";
+  }else{
+    document.getElementById("msg").innerText="❌ ข้อมูลไม่ถูกต้อง";
+  }
 }
 </script>
 
