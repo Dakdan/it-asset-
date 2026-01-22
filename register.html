@@ -1,98 +1,65 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ลงทะเบียนเจ้าหน้าที่ - IT Udon Hospital</title>
-    <link rel="stylesheet" href="style.css?v=6.0">
-</head>
-<body>
-    <div id="loader" class="loader-overlay"><div class="spinner"></div></div>
+<div class="login-card">
+    <h2 style="color:var(--primary-pink); margin-bottom: 20px;">🖋️ ลงทะเบียนเจ้าหน้าที่ IT</h2>
+    
+    <div class="form-group">
+        <label>🆔 USERID (ไอดีล็อกอิน)</label>
+        <input type="text" id="USERID" placeholder="ระบุไอดี">
+    </div>
 
-    <div class="login-wrapper">
-        <div class="login-header">
-            <img src="https://img2.pic.in.th/-227e4f6f84f29f020.png" class="header-logo">
-            <div class="header-text">
-                <h1>โรงพยาบาลอุดรธานี</h1>
-                <p>📧 สมัครสมาชิกและรับรหัสผ่านทางอีเมล</p>
-            </div>
+    <div class="form-group">
+        <label>📧 UserMail (อีเมลสำหรับรับรหัส)</label>
+        <input type="email" id="UserMail" placeholder="ระบุอีเมลที่ใช้งานจริง">
+    </div>
+
+    <div style="display: flex; gap: 10px;">
+        <div class="form-group" style="flex: 1;">
+            <label>👤 UserName (ชื่อ)</label>
+            <input type="text" id="UserName" placeholder="ชื่อ">
         </div>
-
-        <div class="login-card">
-            <h2 style="color:var(--primary-pink); margin-bottom: 20px;">🖋️ ลงทะเบียน IT</h2>
-            
-            <div class="form-group">
-                <label>🆔 Username (ไอดี)</label>
-                <input type="text" id="reg_userid" placeholder="ตัวเลขหรือภาษาอังกฤษ">
-            </div>
-
-            <div class="form-group">
-                <label>📧 Email (สำหรับรับรหัสผ่าน)</label>
-                <input type="email" id="reg_mail" placeholder="ระบุอีเมลที่ใช้งานจริง">
-            </div>
-
-            <div style="display: flex; gap: 10px;">
-                <div class="form-group" style="flex: 1;">
-                    <label>👤 ชื่อจริง</label>
-                    <input type="text" id="reg_name" placeholder="ชื่อ">
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label>👥 นามสกุล</label>
-                    <input type="text" id="reg_sname" placeholder="นามสกุล">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label>🛠️ ตำแหน่งงาน</label>
-                <select id="reg_type_name">
-                    <option value="">-- เลือกตำแหน่ง --</option>
-                    <option value="หัวหน้างาน IT">💼 หัวหน้างาน IT</option>
-                    <option value="นักวิชาการคอมพิวเตอร์">💻 นักวิชาการคอมพิวเตอร์</option>
-                    <option value="ช่างเทคนิคคอมพิวเตอร์">🔧 ช่างเทคนิคคอมพิวเตอร์</option>
-                </select>
-            </div>
-
-            <button onclick="handleRegister()" class="btn-login" id="submitBtn">📩 ลงทะเบียนและรับรหัสผ่าน</button>
-
-            <button type="button" onclick="window.location.replace('login.html')" class="btn-back">⬅️ กลับหน้าล็อกอิน</button>
+        <div class="form-group" style="flex: 1;">
+            <label>👥 UserSname (นามสกุล)</label>
+            <input type="text" id="UserSname" placeholder="นามสกุล">
         </div>
     </div>
 
-    <script src="js/main.js"></script>
-    <script>
-        async function handleRegister() {
-            const btn = document.getElementById('submitBtn');
-            const data = {
-                action: 'registerIT',
-                userid: document.getElementById('reg_userid').value,
-                email: document.getElementById('reg_mail').value,
-                name: document.getElementById('reg_name').value,
-                sname: document.getElementById('reg_sname').value,
-                typeName: document.getElementById('reg_type_name').value
-            };
+    <div class="form-group">
+        <label>🛠️ UserTypeName (ตำแหน่ง)</label>
+        <select id="UserTypeName">
+            <option value="ช่างเทคนิคคอมพิวเตอร์">🔧 ช่างเทคนิคคอมพิวเตอร์</option>
+            <option value="นักวิชาการคอมพิวเตอร์">💻 นักวิชาการคอมพิวเตอร์</option>
+            <option value="หัวหน้างาน IT">💼 หัวหน้างาน IT</option>
+        </select>
+    </div>
 
-            if(!data.userid || !data.email || !data.name || !data.sname || !data.typeName) {
-                return alert("⚠️ กรุณากรอกข้อมูลให้ครบทุกช่องนะครับ");
-            }
+    <button onclick="handleRegister()" class="btn-login" id="submitBtn">📩 สมัครและรับรหัสทางเมล</button>
+</div>
 
-            document.getElementById('loader').style.display = 'flex';
-            btn.disabled = true;
+<script>
+async function handleRegister() {
+    const btn = document.getElementById('submitBtn');
+    const data = {
+        action: 'registerIT',
+        // ชื่อตัวแปรต้องตรงกับใน Code.gs
+        USERID: document.getElementById('USERID').value,
+        UserMail: document.getElementById('UserMail').value,
+        UserName: document.getElementById('UserName').value,
+        UserSname: document.getElementById('UserSname').value,
+        UserTypeName: document.getElementById('UserTypeName').value
+    };
 
-            try {
-                const res = await apiRequest(data, 'POST');
-                if (res.success) {
-                    alert("🎉 ลงทะเบียนสำเร็จ! ระบบได้ส่งรหัสผ่านไปที่เมล " + data.email + " เรียบร้อยแล้วครับ");
-                    window.location.replace('login.html');
-                } else {
-                    alert("❌ " + res.error);
-                }
-            } catch (e) {
-                alert("❌ การเชื่อมต่อล้มเหลว");
-            } finally {
-                document.getElementById('loader').style.display = 'none';
-                btn.disabled = false;
-            }
+    if(!data.USERID || !data.UserMail) return alert("กรุณากรอกข้อมูลสำคัญให้ครบ");
+
+    document.getElementById('loader').style.display = 'flex';
+    try {
+        const res = await apiRequest(data);
+        if (res.success) {
+            alert("✅ ลงทะเบียนสำเร็จ! รหัสผ่านส่งไปที่เมลของคุณแล้ว");
+            window.location.replace('login.html');
         }
-    </script>
-</body>
-</html>
+    } catch (e) {
+        alert("❌ การเชื่อมต่อล้มเหลว (เช็ค URL ใน main.js หรือการ Deploy)");
+    } finally {
+        document.getElementById('loader').style.display = 'none';
+    }
+}
+</script>
