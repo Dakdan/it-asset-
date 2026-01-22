@@ -1,113 +1,82 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<title>IT Login</title>
-<link rel="stylesheet" href="style.css">
-<style>
-.wrap{max-width:420px;margin:80px auto}
-input,select,button{
- width:100%;padding:12px;margin-top:10px;
- border-radius:12px;border:2px solid #ff4fb3;
- font-size:15px
-}
-button{background:#ff1b8d;color:#fff;font-weight:bold}
-.hide{display:none}
-.link{text-align:center;margin-top:12px}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ - IT Maintenance โรงพยาบาลอุดรธานี</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
-
 <body>
-<div class="wrap card">
 
-<h2 id="title">🔐 เข้าสู่ระบบ</h2>
+    <div id="loader" class="loader-overlay">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <p>กำลังตรวจสอบสิทธิ์...</p>
+        </div>
+    </div>
 
-<!-- LOGIN -->
-<div id="loginBox">
- <input id="l_user" placeholder="Username">
- <input id="l_pass" type="password" placeholder="Password">
- <button onclick="login()">Login</button>
- <div class="link">
-  ยังไม่มีบัญชี?
-  <a href="#" onclick="showRegister()">ลงทะเบียน</a>
- </div>
-</div>
+    <div class="login-wrapper">
+        <div class="login-header">
+            <img src="https://img2.pic.in.th/-227e4f6f84f29f020.png" alt="Logo" class="header-logo">
+            <div class="header-text">
+                <h1>โรงพยาบาลอุดรธานี</h1>
+                <p>ระบบบริหารจัดการครุภัณฑ์คอมพิวเตอร์และบริการ</p>
+            </div>
+        </div>
 
-<!-- REGISTER -->
-<div id="registerBox" class="hide">
- <input id="r_fname" placeholder="ชื่อ">
- <input id="r_lname" placeholder="นามสกุล">
- <input id="r_email" placeholder="Email">
- <input id="r_user" placeholder="ตั้ง Username">
- <input id="r_pass" type="password" placeholder="ตั้ง Password">
+        <div class="login-card">
+            <div class="card-title">
+                <span class="icon">🔓</span> เข้าสู่ระบบ
+            </div>
+            
+            <div class="form-group">
+                <input type="text" id="username" placeholder="Username" required>
+            </div>
+            
+            <div class="form-group">
+                <input type="password" id="password" placeholder="Password" required>
+            </div>
 
- <button onclick="register()">💾 บันทึก</button>
+            <button id="btnLogin" onclick="handleLogin()" class="btn-login">
+                🛡️ Login
+            </button>
 
- <div class="link">
-  <a href="#" onclick="showLogin()">ย้อนกลับ</a>
- </div>
-</div>
+            <div class="card-footer">
+                ยังไม่มีบัญชี? <a href="register.html">ลงทะเบียน</a>
+            </div>
+        </div>
+    </div>
 
-<p id="msg" style="color:red;text-align:center"></p>
+    <script src="js/main.js"></script>
+    <script>
+        async function handleLogin() {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
 
-</div>
+            if(!u || !p) return alert("กรุณากรอกข้อมูลให้ครบ");
 
-<script src="js/api.js"></script>
-<script>
-const loginBox=document.getElementById("loginBox");
-const registerBox=document.getElementById("registerBox");
-const title=document.getElementById("title");
-const msg=document.getElementById("msg");
+            toggleLoader(true); // แสดงสถานะ Feedback
+            
+            try {
+                const res = await apiRequest({
+                    action: 'loginIT',
+                    email: u,
+                    password: p
+                }, 'POST');
 
-function showRegister(){
- title.innerText="📋 ลงทะเบียน";
- loginBox.classList.add("hide");
- registerBox.classList.remove("hide");
- msg.innerText="";
-}
-
-function showLogin(){
- title.innerText="🔐 เข้าสู่ระบบ";
- registerBox.classList.add("hide");
- loginBox.classList.remove("hide");
- msg.innerText="";
-}
-
-/* LOGIN */
-function login(){
- apiPost({
-  action:"login",
-  user:l_user.value,
-  pass:l_pass.value
- }).then(r=>{
-  if(r.success){
-   localStorage.setItem("it_token",r.token);
-   location.href="index.html";
-  }else{
-   msg.innerText="❌ Username หรือ Password ไม่ถูกต้อง";
-  }
- });
-}
-
-/* REGISTER */
-function register(){
- apiPost({
-  action:"register",
-  fname:r_fname.value,
-  lname:r_lname.value,
-  email:r_email.value,
-  user:r_user.value,
-  pass:r_pass.value,
-  dept:r_dept.value
- }).then(r=>{
-  if(r.success){
-   alert("ลงทะเบียนสำเร็จ");
-   showLogin();
-  }else{
-   msg.innerText=r.message||"ลงทะเบียนไม่สำเร็จ";
-  }
- });
-}
-</script>
+                if (res.success) {
+                    localStorage.setItem('session', JSON.stringify(res));
+                    window.location.href = 'index.html';
+                } else {
+                    alert("สิทธิ์การเข้าใช้งานถูกปฏิเสธ หรือข้อมูลไม่ถูกต้อง (กรุณาเช็คสถานะคอลัมน์ 5 ใน ITUser)");
+                }
+            } catch (e) {
+                alert("ไม่สามารถเชื่อมต่อระบบได้");
+            } finally {
+                toggleLoader(false);
+            }
+        }
+    </script>
 </body>
 </html>
