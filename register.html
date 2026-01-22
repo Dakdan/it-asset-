@@ -3,22 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ลงทะเบียน - IT Maintenance โรงพยาบาลอุดรธานี</title>
+    <title>ลงทะเบียน - โรงพยาบาลอุดรธานี</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div id="loader" class="loader-overlay">
-        <div class="loader-content">
-            <div class="spinner"></div>
-            <p>กำลังบันทึกข้อมูล...</p>
-        </div>
-    </div>
+    <div id="loader" class="loader-overlay"><div class="spinner"></div></div>
 
     <div class="login-wrapper">
         <div class="login-header">
-            <img src="https://img2.pic.in.th/-227e4f6f84f29f020.png" alt="Logo" class="header-logo">
+            <img src="https://img2.pic.in.th/-227e4f6f84f29f020.png" class="header-logo">
             <div class="header-text">
                 <h1>โรงพยาบาลอุดรธานี</h1>
                 <p>ลงทะเบียนเจ้าหน้าที่ IT</p>
@@ -26,36 +20,30 @@
         </div>
 
         <div class="login-card">
-            <div class="card-title">📝 ลงทะเบียนใหม่</div>
+            <h2 style="color:var(--primary-pink)">📝 ลงทะเบียนใหม่</h2>
             
             <div class="form-group">
-                <input type="text" id="reg_name" placeholder="ชื่อ-นามสกุล" required>
+                <input type="text" id="reg_name" placeholder="ชื่อ-นามสกุล">
             </div>
-
             <div class="form-group">
-                <input type="email" id="reg_email" placeholder="Email / Username" required>
+                <input type="email" id="reg_email" placeholder="Email / Username">
             </div>
-            
             <div class="form-group">
-                <input type="password" id="reg_password" placeholder="Password" required>
+                <input type="password" id="reg_password" placeholder="Password">
             </div>
-
             <div class="form-group">
-                <select id="reg_position" required>
+                <select id="reg_position">
                     <option value="">-- เลือกตำแหน่งงาน --</option>
                     <option value="หัวหน้างาน IT">หัวหน้างาน IT</option>
                     <option value="ช่างเทคนิคคอมพิวเตอร์">ช่างเทคนิคคอมพิวเตอร์</option>
                     <option value="นักวิชาการคอมพิวเตอร์">นักวิชาการคอมพิวเตอร์</option>
-                    <option value="เจ้าหน้าที่ธุรการ">เจ้าหน้าที่ธุรการ</option>
                 </select>
             </div>
 
-            <button id="btnRegister" onclick="handleRegister()" class="btn-login">
-                ยืนยันการลงทะเบียน
-            </button>
+            <button onclick="handleRegister()" class="btn-login">ยืนยันการลงทะเบียน</button>
 
-            <div class="card-footer">
-                <button onclick="window.location.replace('login.html')" class="btn-secondary">
+            <div>
+                <button onclick="window.location.replace('login.html')" class="btn-back">
                     ⬅️ กลับหน้าหลัก (Login)
                 </button>
             </div>
@@ -67,31 +55,28 @@
         async function handleRegister() {
             const name = document.getElementById('reg_name').value;
             const email = document.getElementById('reg_email').value;
-            const pass = document.getElementById('reg_password').value;
             const pos = document.getElementById('reg_position').value;
+            
+            if(!name || !email || !pos) return alert("กรุณากรอกข้อมูลให้ครบ");
 
-            if(!name || !email || !pass || !pos) return alert("กรุณากรอกข้อมูลให้ครบทุกช่อง");
-
-            toggleLoader(true);
+            document.getElementById('loader').style.display = 'flex';
             try {
                 const res = await apiRequest({
                     action: 'registerIT',
                     name: name,
                     email: email,
-                    password: pass,
+                    password: document.getElementById('reg_password').value,
                     position: pos
                 }, 'POST');
 
                 if (res.success) {
-                    alert("ลงทะเบียนสำเร็จ! กรุณารอหัวหน้าอนุมัติสิทธิ์ (Status = true)");
+                    alert("ลงทะเบียนสำเร็จ! รอการอนุมัติสิทธิ์");
                     window.location.replace('login.html');
-                } else {
-                    alert("ไม่สามารถลงทะเบียนได้");
                 }
             } catch (e) {
-                alert("เชื่อมต่อไม่สำเร็จ");
+                alert("เกิดข้อผิดพลาด");
             } finally {
-                toggleLoader(false);
+                document.getElementById('loader').style.display = 'none';
             }
         }
     </script>
