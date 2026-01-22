@@ -1,63 +1,56 @@
-// *** เปลี่ยน URL เป็นของท่าน ***
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNSgpYNigJX7W-RUPq8SLN4e687pE55p72KsbM-nWFcPefKDhjzYAflsm78i42IW7qrw/exec"; 
+// 1. ตั้งค่า URL (ต้องได้จากการ Deploy แบบ Anyone)
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNSgpYNigJX7W-RUPq8SLN4e687pE55p72KsbM-nWFcPefKDhjzYAflsm78i42IW7qrw/exec";
 
-// 1. ฟังก์ชันเช็คการล็อกอิน (เรียกใช้ทุกหน้า)
-function checkLogin() {
-    const session = localStorage.getItem('it_session');
-    const currentPage = window.location.pathname.split("/").pop();
+// 2. ตรวจสอบสถานะการล็อกอินอัตโนมัติ (เพื่อให้ "จำไว้ไม่ต้องลงชื่อบ่อยๆ")
+document.addEventListener("DOMContentLoaded", function() {
+    checkAuth();
+});
+
+function checkAuth() {
+    const session = localStorage.getItem('it_user_session');
+    const path = window.location.pathname;
+    const page = path.split("/").pop();
 
     if (session) {
-        // ถ้าล็อกอินแล้ว แต่อยู่หน้า login.html หรือ register.html ให้ไปหน้าหลัก
-        if (currentPage === 'login.html' || currentPage === 'register.html' || currentPage === '') {
-            window.location.replace('index.html');
+        // ถ้าล็อกอินอยู่แล้ว แต่อยู่หน้า Login/Register ให้เด้งไปหน้าหลัก
+        if (page === "login.html" || page === "register.html" || page === "") {
+            window.location.href = "index.html";
         }
     } else {
-        // ถ้ายังไม่ได้ล็อกอิน และไม่ได้อยู่หน้า login/register ให้เด้งไปหน้า login
-        if (currentPage !== 'login.html' && currentPage !== 'register.html') {
-            window.location.replace('login.html');
+        // ถ้ายังไม่ได้ล็อกอิน และไม่ได้อยู่หน้า Login/Register ให้เด้งไปหน้า Login
+        if (page !== "login.html" && page !== "register.html") {
+            window.location.href = "login.html";
         }
     }
 }
 
-// 2. ฟังก์ชันล็อกอิน
-async function handleLogin(username, password) {
-    toggleLoader(true);
+// 3. ฟังก์ชันหลักในการรับ-ส่งข้อมูลกับ Google Sheets
+async function apiRequest(data) {
     try {
-        const res = await apiRequest({
-            action: 'login',
-            username: username,
-            password: password
-        }, 'POST');
-
-        if (res.success) {
-            // *** หัวใจสำคัญ: บันทึกข้อมูลลงเครื่องเพื่อ "ไม่ต้องลงชื่อบ่อยๆ" ***
-            localStorage.setItem('it_session', JSON.stringify(res.userData));
-            window.location.replace('index.html');
-        } else {
-            alert(res.error || "Username หรือ Password ไม่ถูกต้อง");
-        }
-    } catch (e) {
-        alert("การเชื่อมต่อเซิร์ฟเวอร์ล้มเหลว");
-    } finally {
-        toggleLoader(false);
+        const response = await fetch(SCRIPT_URL, {
+            method: "POST",
+            body: JSON.stringify(data)
+        });
+        
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        return await response.json();
+    } catch (error) {
+        console.error("API Error:", error);
+        throw error; // ส่ง Error กลับไปให้หน้าบ้านจัดการต่อ
     }
 }
 
-// 3. ฟังก์ชัน Logout (สำหรับปุ่มออกระบบ)
+// 4. ฟังก์ชันออกจากระบบ (Logout)
 function logout() {
-    localStorage.removeItem('it_session');
-    window.location.replace('login.html');
+    if(confirm("ยืนยันการออกจากระบบ?")) {
+        localStorage.removeItem('it_user_session');
+        window.location.href = "login.html";
+    }
 }
 
-// ฟังก์ชัน API Request หลัก
-async function apiRequest(data, method = 'POST') {
-    const response = await fetch(SCRIPT_URL, {
-        method: method,
-        body: JSON.stringify(data)
-    });
-    return await response.json();
-}
-
+// 5. ตัวควบคุมการแสดงผล Loader (หมุนๆ)
 function toggleLoader(show) {
-    document.getElementById('loader').style.display = show ? 'flex' : 'none';
+    const loader = document.getElementById('loader');
+    if(loader) loader.style.display = show ? 'flex' : 'none';
 }
