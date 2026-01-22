@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ลงทะเบียนเจ้าหน้าที่ - IT Udon Hospital</title>
-    <link rel="stylesheet" href="style.css?v=4.0">
+    <title>ลงทะเบียน - IT Hospital</title>
+    <link rel="stylesheet" href="style.css?v=5.0">
 </head>
 <body>
-
     <div id="loader" class="loader-overlay"><div class="spinner"></div></div>
 
     <div class="login-wrapper">
@@ -15,28 +14,28 @@
             <img src="https://img2.pic.in.th/-227e4f6f84f29f020.png" class="header-logo">
             <div class="header-text">
                 <h1>โรงพยาบาลอุดรธานี</h1>
-                <p>📧 ลงทะเบียนและยืนยันผ่านอีเมล</p>
+                <p>📧 ระบบลงทะเบียนและรับรหัสทางเมล</p>
             </div>
         </div>
 
-        <div class="login-card" id="regForm">
-            <h2 style="color:var(--primary-pink); margin-bottom: 25px;">🖋️ ลงทะเบียนสมาชิก</h2>
+        <div class="login-card">
+            <h2 style="color:var(--primary-pink); margin-bottom: 20px;">🖋️ สมัครสมาชิกใหม่</h2>
+            
             <div class="form-group">
-                <label>🆔 Username</label>
-                <input type="text" id="reg_username" placeholder="ไอดีล็อกอิน">
+                <label>🆔 Username (ไอดี)</label>
+                <input type="text" id="reg_username" placeholder="ตั้งไอดีของคุณ">
             </div>
+
             <div class="form-group">
-                <label>📧 Email (สำหรับรับรหัสยืนยัน)</label>
-                <input type="email" id="reg_email" placeholder="ต้องเป็นเมลที่ใช้งานได้จริง">
+                <label>📧 Email (สำหรับรับรหัสผ่าน)</label>
+                <input type="email" id="reg_email" placeholder="ต้องเป็นอีเมลที่ใช้งานได้จริง">
             </div>
+
             <div class="form-group">
                 <label>👤 ชื่อ-นามสกุล</label>
                 <input type="text" id="reg_name" placeholder="ชื่อจริง-นามสกุล">
             </div>
-            <div class="form-group">
-                <label>🔐 รหัสผ่าน</label>
-                <input type="password" id="reg_password" placeholder="รหัสผ่าน 6 ตัวขึ้นไป">
-            </div>
+
             <div class="form-group">
                 <label>🏢 ตำแหน่ง</label>
                 <select id="reg_position">
@@ -46,42 +45,47 @@
                     <option value="ช่างเทคนิคคอมพิวเตอร์">🔧 ช่างเทคนิคคอมพิวเตอร์</option>
                 </select>
             </div>
-            <button onclick="sendOTP()" class="btn-login" id="btnSend">📩 ส่งรหัสยืนยันไปที่เมล</button>
-            <button type="button" onclick="window.location.replace('login.html')" class="btn-back">⬅️ กลับหน้าล็อกอิน</button>
-        </div>
 
-        <div class="login-card" id="otpForm" style="display: none;">
-            <h2 style="color:var(--primary-pink); margin-bottom: 20px;">🔐 ยืนยันรหัสผ่าน</h2>
-            <p style="font-size: 0.9rem; margin-bottom: 20px; color: #666;">เราได้ส่งรหัส 6 หลักไปที่ <br><b id="displayEmail"></b></p>
-            <div class="form-group">
-                <input type="text" id="input_otp" placeholder="กรอกรหัส 6 หลัก" style="text-align: center; font-size: 1.5rem; letter-spacing: 5px;">
-            </div>
-            <button onclick="verifyAndRegister()" class="btn-login">✅ ยืนยันและลงทะเบียน</button>
-            <button type="button" onclick="location.reload()" class="btn-back">🔄 แก้ไขข้อมูล/ส่งใหม่</button>
+            <button onclick="handleRegister()" class="btn-login" id="submitBtn">📩 ลงทะเบียนและรับรหัสทางเมล</button>
+
+            <button type="button" onclick="window.location.replace('login.html')" class="btn-back">⬅️ กลับไปหน้าล็อกอิน</button>
         </div>
     </div>
 
     <script src="js/main.js"></script>
     <script>
-        let generatedOTP = ""; 
+        async function handleRegister() {
+            const btn = document.getElementById('submitBtn');
+            const data = {
+                action: 'registerAndSendEmail', // เรียกใช้ฟังก์ชันส่งเมลใน Google Script
+                username: document.getElementById('reg_username').value,
+                email: document.getElementById('reg_email').value,
+                name: document.getElementById('reg_name').value,
+                position: document.getElementById('reg_position').value
+            };
 
-        async function sendOTP() {
-            const email = document.getElementById('reg_email').value;
-            if(!email.includes('@')) return alert("⚠️ กรุณากรอกอีเมลให้ถูกต้อง");
+            if(!data.username || !data.email || !data.name || !data.position) {
+                return alert("⚠️ กรุณากรอกข้อมูลให้ครบทุกช่องนะครับ");
+            }
 
             document.getElementById('loader').style.display = 'flex';
-            try {
-                // สั่งให้ Server ส่งเมล
-                const res = await apiRequest({ action: 'sendOTP', email: email }, 'POST');
-                if (res.success) {
-                    generatedOTP = res.otp; // รับ OTP (ชั่วคราว) มาเทียบ หรือให้ Server เช็คก็ได้
-                    document.getElementById('displayEmail').innerText = email;
-                    document.getElementById('regForm').style.display = 'none';
-                    document.getElementById('otpForm').style.display = 'block';
-                }
-            } catch (e) { alert("❌ ส่งเมลไม่สำเร็จ"); }
-            finally { document.getElementById('loader').style.display = 'none'; }
-        }
+            btn.disabled = true;
 
-        async function verifyAndRegister() {
-            const inputOtp = document.getElementById('input_otp
+            try {
+                const res = await apiRequest(data, 'POST');
+                if (res.success) {
+                    alert("✅ ลงทะเบียนสำเร็จ! ระบบส่งรหัสยืนยันไปที่อีเมล " + data.email + " แล้วครับ");
+                    window.location.replace('login.html');
+                } else {
+                    alert("❌ " + res.error);
+                }
+            } catch (e) {
+                alert("❌ ระบบขัดข้อง โปรดเช็คอินเทอร์เน็ต");
+            } finally {
+                document.getElementById('loader').style.display = 'none';
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
