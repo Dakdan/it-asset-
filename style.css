@@ -1,14 +1,14 @@
-/* นำเข้า Font Kanit จาก Google Fonts */
+/* นำเข้า Font Kanit */
 @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap');
 
 :root {
-    --primary-pink: #ff0080;      /* ชมพูเข้มรพ. */
-    --border-neon: #ff00ff;       /* ชมพูสะท้อนแสงสำหรับขอบ Input */
-    --btn-border: #00ff00;        /* ขอบเขียวสะท้อนแสงสำหรับปุ่ม Login */
-    --bg-soft-pink: #fce4ec;      /* พื้นหลังชมพูอ่อน */
+    --primary-pink: #ff0080;      /* ชมพูหลัก (ปุ่ม/หัวข้อ) */
+    --neon-pink: #ff00ff;         /* ชมพูสะท้อนแสง (ขอบ Input) */
+    --neon-green: #00ff00;        /* เขียวสะท้อนแสง (ขอบปุ่ม Login) */
+    --bg-pink: #fce4ec;           /* พื้นหลังชมพูอ่อน */
+    --dark-pink: #800040;         /* ชมพูเลือดหมู (Gradient) */
     --white: #ffffff;
-    --deep-maroon: #800040;      /* สีเลือดหมูสำหรับ Gradient Header */
-    --shadow: 0 10px 25px rgba(0,0,0,0.1);
+    --black: #000000;
 }
 
 * {
@@ -20,64 +20,30 @@ body {
     margin: 0;
     padding: 0;
     min-height: 100vh;
+    background-color: var(--bg-pink);
     display: flex;
-    flex-direction: column;
-    background-color: var(--bg-soft-pink);
-}
-
-/* ================= NAVIGATION & HEADER ================= */
-nav {
-    background: var(--white);
-    padding: 10px 0;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-.nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 0 20px;
-}
-
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.logo {
-    height: 50px;
-    width: auto;
-}
-
-.brand-text {
-    font-size: 1.2rem;
-    font-weight: 500;
-    color: var(--primary-pink);
 }
 
 /* ================= LOGIN & REGISTER WRAPPER ================= */
 .login-wrapper {
     width: 100%;
     max-width: 450px;
-    margin: auto; /* จัดกึ่งกลางหน้าจอ */
     padding: 20px;
 }
 
+/* ส่วนหัว Header ตามรูปตัวอย่าง */
 .login-header {
-    background: linear-gradient(to right, var(--deep-maroon), var(--primary-pink));
-    padding: 20px;
-    border-radius: 15px 15px 0 0;
+    background: linear-gradient(to bottom, var(--dark-pink), var(--primary-pink));
+    padding: 15px;
+    border-radius: 20px 20px 0 0;
     display: flex;
     align-items: center;
     gap: 15px;
     color: white;
-    border: 2px solid #33001a;
+    border: 2px solid var(--black);
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
 }
 
 .header-logo {
@@ -86,74 +52,161 @@ nav {
     background: white;
     border-radius: 50%;
     padding: 5px;
+    object-fit: contain;
 }
 
 .header-text h1 {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     margin: 0;
+    letter-spacing: 1px;
 }
 
 .header-text p {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     margin: 0;
     font-weight: 300;
 }
 
-/* ================= CARD & FORM ELEMENTS ================= */
-.login-card, .card {
+/* ================= CARD BODY ================= */
+.login-card {
     background: var(--white);
     padding: 30px;
-    border-radius: 0 0 15px 15px;
-    box-shadow: var(--shadow);
-    border: 2px solid #33001a;
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: 2px solid var(--black);
     border-top: none;
     text-align: center;
 }
 
-/* สำหรับหน้า Dashboard index.html */
-.container .card {
-    border-radius: 15px;
-    border-top: 2px solid #33001a;
-    text-align: left;
-    margin-top: 20px;
-}
-
 .card-title {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     font-weight: 500;
     color: var(--primary-pink);
     margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }
 
+/* ================= INPUTS & SELECT ================= */
 .form-group {
     margin-bottom: 20px;
-    text-align: left;
 }
 
-label {
-    display: block;
-    margin-bottom: 8px;
-    color: #555;
-    font-size: 0.9rem;
-}
-
-/* Input & Select สไตล์สะท้อนแสงตามรูปตัวอย่าง */
 input, select, textarea {
     width: 100%;
     padding: 12px 20px;
-    border: 2px solid var(--border-neon);
-    border-radius: 15px;
+    border: 2px solid var(--neon-pink); /* ขอบชมพูสะท้อนแสง */
+    border-radius: 20px;
     font-size: 1rem;
     outline: none;
     transition: 0.3s;
-    background-color: white;
+    color: #444;
 }
 
-input:focus, select:focus, textarea:focus {
-    box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
+input:focus, select:focus {
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.4);
 }
 
-/* ตกแต่ง Dropdown (Select) */
+/* ปรับแต่ง Dropdown ตำแหน่งงาน */
 select {
+    background-color: white;
+    cursor: pointer;
     appearance: none;
-    background-image: url("data:image/svg
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ff00ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 18px;
+}
+
+/* ================= BUTTONS ================= */
+/* ปุ่ม Login หลัก (ชมพูขอบเขียว) */
+.btn-login, .btn-primary {
+    width: 100%;
+    background: var(--primary-pink);
+    color: white;
+    border: 2px solid var(--neon-green); /* ขอบเขียวสะth้อนแสง */
+    padding: 12px;
+    border-radius: 20px;
+    font-size: 1.3rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn-login:hover {
+    transform: scale(1.02);
+    filter: brightness(1.1);
+}
+
+.btn-login:active {
+    transform: scale(0.98);
+}
+
+/* ปุ่ม "กลับหน้าหลัก" แก้ไขให้แสดงผลชัดเจนและกดง่าย */
+.btn-secondary-link {
+    background: none;
+    border: none;
+    color: var(--primary-pink);
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-top: 20px;
+    display: inline-block;
+}
+
+.btn-secondary-link:hover {
+    color: var(--dark-pink);
+}
+
+/* ================= LOADER ================= */
+.loader-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.spinner {
+    width: 50px; height: 50px;
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid var(--primary-pink);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ================= DASHBOARD SPECIFIC (index.html) ================= */
+nav {
+    position: fixed; top: 0; width: 100%;
+    background: white; border-bottom: 2px solid var(--dark-pink);
+    padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;
+}
+
+.container {
+    margin-top: 100px;
+    width: 100%; max-width: 900px;
+}
+
+.card {
+    background: white; border-radius: 20px; padding: 30px;
+    border: 2px solid var(--black); box-shadow: var(--shadow);
+}
+
+.form-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+}
+
+@media (max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+}
