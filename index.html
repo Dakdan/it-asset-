@@ -1,95 +1,33 @@
 <!DOCTYPE html>
-<html lang="th">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>IT Maintenance System</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<title>IT Dashboard</title>
 <link rel="stylesheet" href="style.css">
-
-<style>
-.hidden{display:none}
-input,select,textarea,button{
- width:100%;padding:10px;margin-top:8px;
- border-radius:8px;border:1px solid #ddd;
-}
-button{background:#ff5fa2;color:#fff;font-weight:bold}
-.card{margin-bottom:15px}
-.status-new{color:#ff9800;font-weight:bold}
-.status-work{color:#2196f3;font-weight:bold}
-.status-done{color:#4caf50;font-weight:bold}
-table{width:100%;border-collapse:collapse}
-th,td{border-bottom:1px solid #eee;padding:8px;font-size:14px}
-</style>
 </head>
-
 <body>
 
 <header class="app-header">
-  <div>
-    <div class="app-title">⛑ IT Maintenance</div>
-    <div class="app-subtitle" id="userInfo"></div>
-  </div>
+ <div>
+  <div class="app-title">ระบบ IT Maintenance</div>
+  <div class="app-subtitle" id="userInfo"></div>
+ </div>
+ <button onclick="logout()">ออกจากระบบ</button>
 </header>
 
 <main>
 
-<!-- REGISTER -->
-<div class="card" id="registerBox">
-<h3>📝 ลงทะเบียนเจ้าหน้าที่ IT</h3>
-<input id="r_name" placeholder="ชื่อ-สกุล">
-<input id="r_email" placeholder="Email">
-<input id="r_pass" type="password" placeholder="Password">
-<input id="r_pos" placeholder="ตำแหน่ง">
-<button onclick="register()">ลงทะเบียน</button>
-<p id="r_msg"></p>
-</div>
-
-<!-- VERIFY -->
-<div class="card hidden" id="verifyBox">
-<h3>📧 ยืนยัน Email</h3>
-<input id="v_email" placeholder="Email">
-<input id="v_code" placeholder="รหัสยืนยัน">
-<button onclick="verify()">ยืนยัน</button>
-<p id="v_msg"></p>
-</div>
-
-<!-- LOGIN -->
-<div class="card hidden" id="loginBox">
-<h3>🔐 เข้าสู่ระบบ IT</h3>
-<input id="l_email" placeholder="Email">
-<input id="l_pass" type="password" placeholder="Password">
-<button onclick="login()">Login</button>
-<p id="l_msg"></p>
-</div>
-
-<!-- DASHBOARD -->
-<div class="hidden" id="dashboard">
-
+<!-- งานที่กำลังดำเนินการ -->
 <div class="card">
-<h3>➕ เปิดงานใหม่ (IT เปิดเองได้)</h3>
-<select id="jobType"></select>
-<select id="jobSubType"></select>
-<textarea id="problem" placeholder="รายละเอียดปัญหา"></textarea>
-<input id="contact" placeholder="เบอร์ติดต่อกลับ">
-<button onclick="createJob()">บันทึกงาน</button>
-</div>
-
-<div class="card">
-<h3>📋 งานทั้งหมด</h3>
-<table>
+<h3>🛠 งานที่กำลังดำเนินการ</h3>
+<table id="jobTable">
 <thead>
 <tr>
-<th>ID</th>
-<th>ประเภท</th>
-<th>สถานะ</th>
-<th>จัดการ</th>
+<th>ID</th><th>ประเภท</th><th>สถานะ</th><th>จัดการ</th>
 </tr>
 </thead>
-<tbody id="jobTable"></tbody>
+<tbody></tbody>
 </table>
-</div>
-
 </div>
 
 </main>
@@ -98,84 +36,21 @@ th,td{border-bottom:1px solid #eee;padding:8px;font-size:14px}
 <script src="js/main.js"></script>
 
 <script>
-const token = localStorage.getItem("it_token");
+const token=localStorage.getItem("it_token");
+if(!token) location.href="login.html";
 
-/* AUTO LOGIN */
-if(token){
- apiPost({action:"checkToken",token}).then(r=>{
-  if(r.valid){
-   showDashboard();
-  }else{
-   showLogin();
-  }
- });
-}else{
- showRegister();
-}
+apiPost({action:"checkToken",token}).then(r=>{
+ if(!r.valid){
+  localStorage.removeItem("it_token");
+  location.href="login.html";
+ }else{
+  userInfo.innerText="ผู้ใช้งาน: "+r.user;
+ }
+});
 
-function showRegister(){
- hideAll(); document.getElementById("registerBox").classList.remove("hidden");
-}
-function showVerify(){
- hideAll(); document.getElementById("verifyBox").classList.remove("hidden");
-}
-function showLogin(){
- hideAll(); document.getElementById("loginBox").classList.remove("hidden");
-}
-function showDashboard(){
- hideAll();
- document.getElementById("dashboard").classList.remove("hidden");
- document.getElementById("userInfo").innerText =
-  JSON.parse(localStorage.getItem("it_user")).name +
-  " ("+JSON.parse(localStorage.getItem("it_user")).position+")";
- loadJobType(); loadJobs();
-}
-function hideAll(){
- ["registerBox","verifyBox","loginBox","dashboard"]
- .forEach(i=>document.getElementById(i).classList.add("hidden"));
-}
-
-/* REGISTER */
-function register(){
- apiPost({
-  action:"registerIT",
-  name:r_name.value,
-  email:r_email.value,
-  password:r_pass.value,
-  position:r_pos.value
- }).then(r=>{
-  if(r.success){
-   v_email.value=r_email.value;
-   showVerify();
-  }else r_msg.innerText="❌ Email ซ้ำ";
- });
-}
-
-/* VERIFY */
-function verify(){
- apiPost({
-  action:"verifyEmail",
-  email:v_email.value,
-  code:v_code.value
- }).then(r=>{
-  if(r.success) showLogin();
-  else v_msg.innerText="❌ ไม่ถูกต้อง";
- });
-}
-
-/* LOGIN */
-function login(){
- apiPost({
-  action:"loginIT",
-  email:l_email.value,
-  password:l_pass.value
- }).then(r=>{
-  if(r.success){
-   localStorage.setItem("it_token",r.token);
-   localStorage.setItem("it_user",JSON.stringify(r));
-   showDashboard();
-  }else l_msg.innerText="❌ Login ไม่ผ่าน";
- });
+function logout(){
+ localStorage.removeItem("it_token");
+ location.href="login.html";
 }
 </script>
 
