@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - IT Maintenance โรงพยาบาลอุดรธานี</title>
+    <title>IT Service - โรงพยาบาลอุดรธานี</title>
     
     <script>
-        const session = localStorage.getItem('session');
-        if (!session) {
+        const userSession = localStorage.getItem('session');
+        if (!userSession) {
             window.location.replace('login.html');
         }
     </script>
@@ -46,6 +46,7 @@
                     <select id="jobType">
                         <option value="คอมพิวเตอร์">คอมพิวเตอร์</option>
                         <option value="เครือข่าย">เครือข่าย</option>
+                        <option value="ซอฟต์แวร์">ซอฟต์แวร์</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -57,17 +58,17 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label>เลขที่บันทึกข้อความ:</label>
-                    <input type="text" id="docNumber">
+                    <input type="text" id="docNumber" placeholder="ระบุเลขที่บันทึก (ถ้ามี)">
                 </div>
                 <div class="form-group">
                     <label>ผู้มอบหมาย:</label>
-                    <input type="text" id="assignBy">
+                    <input type="text" id="assignBy" placeholder="ระบุชื่อผู้มอบหมาย">
                 </div>
             </div>
 
             <div class="form-group">
                 <label>รายละเอียดงาน:</label>
-                <textarea id="detail"></textarea>
+                <textarea id="detail" rows="3" placeholder="ระบุรายละเอียด..."></textarea>
             </div>
 
             <div class="form-grid">
@@ -81,30 +82,32 @@
                 </div>
             </div>
 
-            <button id="btnSubmit" onclick="submitJob()" class="btn-primary">บันทึกข้อมูล</button>
+            <button id="btnSubmit" onclick="submitJob()" class="btn-primary">บันทึกข้อมูลและเปิดใบงาน</button>
         </div>
     </div>
 
     <script src="js/main.js"></script>
     <script>
-        // โหลดข้อมูลเฉพาะเมื่อมี Session แล้วเท่านั้น
-        window.addEventListener('load', async () => {
+        // ทำงานเมื่อหน้าเว็บโหลดเสร็จสมบูรณ์
+        window.addEventListener('DOMContentLoaded', async () => {
             const user = JSON.parse(localStorage.getItem('session'));
             if (user) {
-                document.getElementById('staffName').innerText = user.name;
+                document.getElementById('staffName').innerText = "ผู้ใช้งาน: " + user.name;
                 
-                toggleLoader(true);
+                // โหลด Master Data ครั้งเดียว
                 try {
                     const assets = await apiRequest({action: 'getAssets'}, 'GET');
                     const select = document.getElementById('assetID');
-                    assets.forEach(a => {
-                        const opt = document.createElement('option');
-                        opt.value = a.assetID;
-                        opt.text = `${a.assetID} - ${a.name}`;
-                        select.appendChild(opt);
-                    });
-                } finally {
-                    toggleLoader(false);
+                    if (assets && select) {
+                        assets.forEach(a => {
+                            const opt = document.createElement('option');
+                            opt.value = a.assetID;
+                            opt.text = `${a.assetID} - ${a.name}`;
+                            select.appendChild(opt);
+                        });
+                    }
+                } catch (e) {
+                    console.log("Error loading assets");
                 }
             }
         });
