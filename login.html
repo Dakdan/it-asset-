@@ -1,62 +1,117 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
 <meta charset="UTF-8">
 <title>IT Login</title>
 <link rel="stylesheet" href="style.css">
+<style>
+.wrap{max-width:420px;margin:80px auto}
+input,select,button{
+ width:100%;padding:12px;margin-top:10px;
+ border-radius:12px;border:2px solid #ff4fb3;
+ font-size:15px
+}
+button{background:#ff1b8d;color:#fff;font-weight:bold}
+.hide{display:none}
+.link{text-align:center;margin-top:12px}
+</style>
 </head>
-<body>
 
-<div class="card" style="max-width:360px;margin:80px auto">
+<body>
+<div class="wrap card">
 
 <h2 id="title">🔐 เข้าสู่ระบบ</h2>
 
-<input id="user" placeholder="Username">
-<input id="pass" type="password" placeholder="Password">
+<!-- LOGIN -->
+<div id="loginBox">
+ <input id="l_user" placeholder="Username">
+ <input id="l_pass" type="password" placeholder="Password">
+ <button onclick="login()">Login</button>
+ <div class="link">
+  ยังไม่มีบัญชี?
+  <a href="#" onclick="showRegister()">ลงทะเบียน</a>
+ </div>
+</div>
 
-<button onclick="login()">Login</button>
+<!-- REGISTER -->
+<div id="registerBox" class="hide">
+ <input id="r_fname" placeholder="ชื่อ">
+ <input id="r_lname" placeholder="นามสกุล">
+ <input id="r_email" placeholder="Email">
+ <input id="r_user" placeholder="ตั้ง Username">
+ <input id="r_pass" type="password" placeholder="ตั้ง Password">
 
-<p id="msg" style="color:red"></p>
+ <select id="r_dept">
+  <option value="">-- เลือกหน่วยงาน --</option>
+  <option>IT</option>
+  <option>การเงิน</option>
+  <option>พยาบาล</option>
+ </select>
 
-<p style="text-align:center;margin-top:10px">
-<span id="toggleText">
-ยังไม่มีบัญชี?
-<a href="#" onclick="showRegister()">ลงทะเบียน</a>
-</span>
-</p>
+ <button onclick="register()">💾 บันทึก</button>
+
+ <div class="link">
+  <a href="#" onclick="showLogin()">ย้อนกลับ</a>
+ </div>
+</div>
+
+<p id="msg" style="color:red;text-align:center"></p>
 
 </div>
 
 <script src="js/api.js"></script>
 <script>
-let mode="login";
+const loginBox=document.getElementById("loginBox");
+const registerBox=document.getElementById("registerBox");
+const title=document.getElementById("title");
+const msg=document.getElementById("msg");
 
 function showRegister(){
- mode="register";
- title.innerText="📝 ลงทะเบียน";
- toggleText.innerHTML=`มีบัญชีแล้ว?
- <a href="#" onclick="showLogin()">เข้าสู่ระบบ</a>`;
+ title.innerText="📋 ลงทะเบียน";
+ loginBox.classList.add("hide");
+ registerBox.classList.remove("hide");
+ msg.innerText="";
 }
 
 function showLogin(){
- mode="login";
  title.innerText="🔐 เข้าสู่ระบบ";
- toggleText.innerHTML=`ยังไม่มีบัญชี?
- <a href="#" onclick="showRegister()">ลงทะเบียน</a>`;
+ registerBox.classList.add("hide");
+ loginBox.classList.remove("hide");
+ msg.innerText="";
 }
 
+/* LOGIN */
 function login(){
- if(!user.value||!pass.value)return;
  apiPost({
-  action: mode==="login"?"login":"register",
-  user:user.value,
-  pass:pass.value
- }).then(res=>{
-  if(res.success){
-   localStorage.setItem("it_token",res.token);
+  action:"login",
+  user:l_user.value,
+  pass:l_pass.value
+ }).then(r=>{
+  if(r.success){
+   localStorage.setItem("it_token",r.token);
    location.href="index.html";
   }else{
-   msg.innerText=res.message||"ไม่สำเร็จ";
+   msg.innerText="❌ Username หรือ Password ไม่ถูกต้อง";
+  }
+ });
+}
+
+/* REGISTER */
+function register(){
+ apiPost({
+  action:"register",
+  fname:r_fname.value,
+  lname:r_lname.value,
+  email:r_email.value,
+  user:r_user.value,
+  pass:r_pass.value,
+  dept:r_dept.value
+ }).then(r=>{
+  if(r.success){
+   alert("ลงทะเบียนสำเร็จ");
+   showLogin();
+  }else{
+   msg.innerText=r.message||"ลงทะเบียนไม่สำเร็จ";
   }
  });
 }
