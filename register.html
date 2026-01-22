@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>ลงทะเบียน IT - รพ.อุดรธานี</title>
-    <link rel="stylesheet" href="style.css?v=9.9">
+    <link rel="stylesheet" href="style.css?v=1.0">
 </head>
 <body>
-    <div id="loader" class="loader-overlay"><div class="spinner"></div></div>
+    <div id="loader" class="loader-overlay" style="display: none;"><div class="spinner"></div></div>
 
     <div class="login-wrapper">
         <div class="login-header">
@@ -17,40 +17,49 @@
 
         <div class="login-card">
             <div class="form-group">
-                <label>🆔 USERID (ไอดีล็อกอิน)</label>
-                <input type="text" id="USERID" placeholder="ระบุไอดี">
+                <label>🆔 USERID</label>
+                <input type="text" id="USERID" placeholder="ระบุไอดีของคุณ">
             </div>
+
             <div class="form-group">
-                <label>📧 UserMail (อีเมลรับรหัส)</label>
-                <input type="email" id="UserMail" placeholder="ระบุอีเมลที่ใช้งานจริง">
+                <label>📧 UserMail</label>
+                <input type="email" id="UserMail" placeholder="อีเมลสำหรับรับรหัสผ่าน">
             </div>
-            <div style="display: flex; gap: 10px;">
-                <div class="form-group" style="flex: 1;">
-                    <label>👤 UserName (ชื่อ)</label>
-                    <input type="text" id="UserName" placeholder="ชื่อ">
-                </div>
-                <div class="form-group" style="flex: 1;">
-                    <label>👥 UserSname (นามสกุล)</label>
-                    <input type="text" id="UserSname" placeholder="นามสกุล">
-                </div>
-            </div>
+
             <div class="form-group">
-                <label>🛠️ UserTypeName (ตำแหน่ง)</label>
+                <label>👤 UserName</label>
+                <input type="text" id="UserName" placeholder="ชื่อจริง">
+            </div>
+
+            <div class="form-group">
+                <label>👥 UserSname</label>
+                <input type="text" id="UserSname" placeholder="นามสกุล">
+            </div>
+
+            <div class="form-group">
+                <label>💼 UserTypeName</label>
                 <select id="UserTypeName">
-                    <option value="ช่างเทคนิคคอมพิวเตอร์">🔧 ช่างเทคนิคคอมพิวเตอร์</option>
-                    <option value="นักวิชาการคอมพิวเตอร์">💻 นักวิชาการคอมพิวเตอร์</option>
-                    <option value="หัวหน้างาน IT">💼 หัวหน้างาน IT</option>
+                    <option value="นักวิชาการคอมพิวเตอร์">นักวิชาการคอมพิวเตอร์</option>
+                    <option value="ช่างเทคนิคคอมพิวเตอร์">ช่างเทคนิคคอมพิวเตอร์</option>
+                    <option value="หัวหน้างาน IT">หัวหน้างาน IT</option>
                 </select>
             </div>
-            <button onclick="handleRegister()" class="btn-login" id="submitBtn">📩 สมัครและรับรหัสทางเมล</button>
+
+            <button onclick="handleRegister()" class="btn-login" id="submitBtn">📩 ลงทะเบียนและส่งรหัสเข้าเมล</button>
+            <button onclick="window.location.replace('login.html')" class="btn-back">⬅️ กลับหน้าล็อกอิน</button>
         </div>
     </div>
 
-    <script src="js/main.js"></script>
     <script>
+        // *** ตรวจสอบ URL นี้ให้ดีว่าได้จากการ Deploy แบบ Anyone หรือไม่ ***
+        const SCRIPT_URL = "URL_ที่คุณได้รับจาก_GOOGLE_APPS_SCRIPT"; 
+
         async function handleRegister() {
-            const btn = document.getElementById('submitBtn');
-            const data = {
+            const submitBtn = document.getElementById('submitBtn');
+            const loader = document.getElementById('loader');
+
+            // ดึงค่าตาม ID ที่สะกดตามตาราง ITUser
+            const payload = {
                 action: 'registerIT',
                 USERID: document.getElementById('USERID').value,
                 UserMail: document.getElementById('UserMail').value,
@@ -59,22 +68,36 @@
                 UserTypeName: document.getElementById('UserTypeName').value
             };
 
-            if(!data.USERID || !data.UserMail || !data.UserName) return alert("กรุณากรอกข้อมูลให้ครบ");
+            // ตรวจสอบค่าว่าง
+            if(!payload.USERID || !payload.UserMail || !payload.UserName) {
+                alert("⚠️ กรุณากรอกข้อมูลสำคัญ (USERID, Email, ชื่อ) ให้ครบถ้วน");
+                return;
+            }
 
-            document.getElementById('loader').style.display = 'flex';
-            btn.disabled = true;
+            // แสดงตัวโหลดและล็อคปุ่ม
+            loader.style.display = 'flex';
+            submitBtn.disabled = true;
 
             try {
-                const res = await apiRequest(data);
-                if (res.success) {
-                    alert("✅ สำเร็จ! กรุณาเช็ครหัสผ่านในอีเมลของคุณ");
-                    window.location.href = "login.html";
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+
+                if (result.success) {
+                    alert("✅ สำเร็จ! ระบบส่งรหัสผ่าน (UserPW) ไปที่อีเมล " + payload.UserMail + " แล้ว");
+                    window.location.replace('login.html');
+                } else {
+                    alert("❌ สคริปต์แจ้งข้อผิดพลาด: " + (result.error || "ไม่ทราบสาเหตุ"));
                 }
-            } catch (e) {
-                alert("❌ การเชื่อมต่อล้มเหลว: ตรวจสอบ URL ใน main.js หรือสิทธิ์การเข้าถึงใน Google Script");
+            } catch (error) {
+                console.error(error);
+                alert("❌ การเชื่อมต่อล้มเหลว: โปรดเช็คการตั้งค่า Deployment ใน Google Script ว่าเป็น 'Anyone' หรือยัง?");
             } finally {
-                document.getElementById('loader').style.display = 'none';
-                btn.disabled = false;
+                loader.style.display = 'none';
+                submitBtn.disabled = false;
             }
         }
     </script>
