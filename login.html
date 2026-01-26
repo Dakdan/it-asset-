@@ -1,65 +1,31 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>เข้าสู่ระบบ - IT Maintenance</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link rel="stylesheet" href="./style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<title>Login</title>
+<link rel="stylesheet" href="style.css">
 </head>
+<body>
 
-<body class="login-page">
-
-<!-- LOADER (เพิ่ม) -->
-<div id="loader" class="loader-overlay" style="display:none;">
-  <div class="spinner"></div>
+<div class="card">
+  <h2>เข้าสู่ระบบ</h2>
+  <input id="username" placeholder="Username">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="handleLogin()">เข้าสู่ระบบ</button>
+  <a href="register.html">สมัครสมาชิก</a>
 </div>
 
-<!-- POPUP (เพิ่ม) -->
-<div id="popup" class="popup-overlay" style="display:none;">
+<div id="loader" class="loader">Loading...</div>
+
+<div id="popup" class="popup">
   <div class="popup-box">
-    <h3 id="popup-title">แจ้งเตือน</h3>
+    <h3 id="popup-title"></h3>
     <p id="popup-message"></p>
-    <button onclick="closePopup()" class="btn-login">ตกลง</button>
+    <button onclick="closePopup()">ตกลง</button>
   </div>
 </div>
 
-<div class="login-wrapper">
-
-  <!-- HEADER -->
-  <div class="login-header">
-    <img src="./โรงพยาบาลอุดรธานี.png" class="header-logo">
-    <h1>โรงพยาบาลอุดรธานี</h1>
-    <p>ระบบบริหารจัดการครุภัณฑ์คอมพิวเตอร์และบริการ</p>
-  </div>
-
-  <!-- CARD -->
-  <div class="login-card">
-
-    <div class="form-group">
-      <label>👤 Email / Username</label>
-      <input type="text" id="username" autocomplete="username">
-    </div>
-
-    <div class="form-group">
-      <label>🔒 Password</label>
-      <input type="password" id="password" autocomplete="current-password">
-    </div>
-
-    <button class="btn-login" onclick="handleLogin()">
-      🛡️ Login
-    </button>
-
-    <div class="card-footer" style="text-align:center; margin-top:15px;">
-      ยังไม่มีบัญชี? <a href="register.html">ลงทะเบียน</a>
-    </div>
-
-  </div>
-</div>
-
-<script src="./js/api.js"></script>
-<script src="./js/main.js"></script>
-
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>
