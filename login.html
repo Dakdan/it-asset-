@@ -9,7 +9,8 @@
 </head>
 <body>
 
-    <div id="loader" class="loader-overlay">
+    <!-- Loader -->
+    <div id="loader" class="loader-overlay" style="display:none;">
         <div class="loader-content">
             <div class="spinner"></div>
             <p>กำลังตรวจสอบสิทธิ์...</p>
@@ -31,7 +32,7 @@
             </div>
             
             <div class="form-group">
-                <input type="text" id="username" placeholder="Username" required>
+                <input type="text" id="username" placeholder="Email / Username" required>
             </div>
             
             <div class="form-group">
@@ -51,28 +52,34 @@
     <script src="js/main.js"></script>
     <script>
         async function handleLogin() {
-            const u = document.getElementById('username').value;
-            const p = document.getElementById('password').value;
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
 
-            if(!u || !p) return alert("กรุณากรอกข้อมูลให้ครบ");
+            if (!u || !p) {
+                alert("กรุณากรอกข้อมูลให้ครบ");
+                return;
+            }
 
-            toggleLoader(true); // แสดงสถานะ Feedback
-            
+            toggleLoader(true);
+
             try {
                 const res = await apiRequest({
                     action: 'loginIT',
                     email: u,
                     password: p
-                }, 'POST');
+                });
 
-                if (res.success) {
-                    localStorage.setItem('session', JSON.stringify(res));
-                    window.location.href = 'index.html';
+                if (res && res.success) {
+                    // ✅ ใช้ key เดียวกับ index.html
+                    localStorage.setItem('it_session', JSON.stringify(res));
+                    window.location.replace('index.html');
                 } else {
-                    alert("สิทธิ์การเข้าใช้งานถูกปฏิเสธ หรือข้อมูลไม่ถูกต้อง (กรุณาเช็คสถานะคอลัมน์ 5 ใน ITUser)");
+                    alert("❌ Email หรือ Password ไม่ถูกต้อง");
                 }
-            } catch (e) {
-                alert("ไม่สามารถเชื่อมต่อระบบได้");
+
+            } catch (err) {
+                alert("❌ ไม่สามารถเชื่อมต่อระบบได้");
+                console.error(err);
             } finally {
                 toggleLoader(false);
             }
