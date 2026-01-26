@@ -1,5 +1,5 @@
 const SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbzNSgpYNigJX7W-RUPq8SLN4e687pE55p72KsbM-nWFcPefKDhjzYAflsm78i42IW7qrw/exec";
+  "https://script.google.com/macros/s/AKfycbxAo8kefBM-H2M_xGjACZ_eHX26j1GPb6nwUvisG9s77G1I65AhjHbJiNxKQg3wz3zfnA/exec";
 
 /* =========================
    CORE REQUEST
