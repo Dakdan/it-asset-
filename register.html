@@ -2,18 +2,22 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>ลงทะเบียน</title>
+  <title>ลงทะเบียน - IT Maintenance</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" href="./style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body class="login-page">
 
-<div id="loader" class="loader-overlay">
+<!-- ================= LOADER ================= -->
+<div id="loader" class="loader-overlay" style="display:none;">
   <div class="spinner"></div>
 </div>
 
-<div id="popup" class="popup-overlay">
+<!-- ================= POPUP ================= -->
+<div id="popup" class="popup-overlay" style="display:none;">
   <div class="popup-box">
     <h3 id="popup-title">แจ้งเตือน</h3>
     <p id="popup-message"></p>
@@ -23,34 +27,52 @@
 
 <div class="login-wrapper">
 
+  <!-- ================= HEADER ================= -->
   <div class="login-header">
     <h1>ลงทะเบียนผู้ใช้</h1>
+    <p>ระบบบริหารจัดการครุภัณฑ์คอมพิวเตอร์และบริการ</p>
   </div>
 
+  <!-- ================= REGISTER CARD ================= -->
   <div class="login-card">
+
     <div class="form-group">
-      <input id="USERID" placeholder="User ID" autocomplete="username">
+      <label>👤 User ID</label>
+      <input type="text" id="USERID" autocomplete="username">
     </div>
 
     <div class="form-group">
-      <input id="UserName" placeholder="ชื่อ">
+      <label>🧑 ชื่อ</label>
+      <input type="text" id="UserName">
     </div>
 
     <div class="form-group">
-      <input id="UserSname" placeholder="นามสกุล">
+      <label>👨‍👩‍👧‍👦 นามสกุล</label>
+      <input type="text" id="UserSname">
     </div>
 
     <div class="form-group">
-      <input id="UserMail" placeholder="Email" type="email" autocomplete="email">
+      <label>📧 Email</label>
+      <input type="email" id="UserMail" autocomplete="email">
     </div>
 
+    <!-- กำหนดสิทธิ์เริ่มต้น -->
     <input type="hidden" id="UserTypeName" value="เจ้าหน้าที่ IT">
 
-    <button class="btn-login" onclick="handleRegister()">สมัครสมาชิก</button>
-  </div>
+    <button class="btn-login" onclick="handleRegister()">
+      สมัครสมาชิก
+    </button>
 
+    <div class="card-footer" style="text-align:center; margin-top:15px;">
+      มีบัญชีแล้ว? <a href="login.html">เข้าสู่ระบบ</a>
+    </div>
+
+  </div>
 </div>
 
+<!-- ================= SCRIPT ================= -->
+<script src="./js/api.js"></script>
 <script src="./js/main.js"></script>
+
 </body>
 </html>
