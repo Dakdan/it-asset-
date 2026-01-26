@@ -9,81 +9,83 @@
 </head>
 <body>
 
-    <!-- Loader -->
-    <div id="loader" class="loader-overlay" style="display:none;">
-        <div class="loader-content">
-            <div class="spinner"></div>
-            <p>กำลังตรวจสอบสิทธิ์...</p>
-        </div>
+<!-- Loader -->
+<div id="loader" class="loader-overlay" style="display:none;">
+    <div class="loader-content">
+        <div class="spinner"></div>
+        <p>กำลังตรวจสอบสิทธิ์...</p>
+    </div>
+</div>
+
+<div class="login-wrapper">
+    <div class="login-header">
+        <img src="https://img2.pic.in.th/-227e4f6f84f29f020.png" class="header-logo">
+        <h1>โรงพยาบาลอุดรธานี</h1>
+        <p>ระบบบริหารจัดการครุภัณฑ์คอมพิวเตอร์และบริการ</p>
     </div>
 
-    <div class="login-wrapper">
-        <div class="login-header">
-            <img src="https://img2.pic.in.th/-227e4f6f84f29f020.png" alt="Logo" class="header-logo">
-            <div class="header-text">
-                <h1>โรงพยาบาลอุดรธานี</h1>
-                <p>ระบบบริหารจัดการครุภัณฑ์คอมพิวเตอร์และบริการ</p>
-            </div>
+    <div class="login-card">
+        <div class="card-title">🔓 เข้าสู่ระบบ</div>
+
+        <div class="form-group">
+            <input type="text" id="username" placeholder="Email / Username">
         </div>
 
-        <div class="login-card">
-            <div class="card-title">
-                <span class="icon">🔓</span> เข้าสู่ระบบ
-            </div>
-            
-            <div class="form-group">
-                <input type="text" id="username" placeholder="Email / Username" required>
-            </div>
-            
-            <div class="form-group">
-                <input type="password" id="password" placeholder="Password" required>
-            </div>
+        <div class="form-group">
+            <input type="password" id="password" placeholder="Password">
+        </div>
 
-            <button id="btnLogin" onclick="handleLogin()" class="btn-login">
-                🛡️ Login
-            </button>
+        <button class="btn-login" onclick="handleLogin()">🛡️ Login</button>
 
-            <div class="card-footer">
-                ยังไม่มีบัญชี? <a href="register.html">ลงทะเบียน</a>
-            </div>
+        <div class="card-footer">
+            ยังไม่มีบัญชี? <a href="register.html">ลงทะเบียน</a>
         </div>
     </div>
+</div>
 
-    <script src="js/main.js"></script>
-    <script>
-        async function handleLogin() {
-            const u = document.getElementById('username').value.trim();
-            const p = document.getElementById('password').value.trim();
+<!-- Popup -->
+<div id="popup" class="popup-overlay">
+    <div class="popup-box">
+        <h3 id="popup-title"></h3>
+        <p id="popup-message"></p>
+        <button onclick="closePopup()">ตกลง</button>
+    </div>
+</div>
 
-            if (!u || !p) {
-                alert("กรุณากรอกข้อมูลให้ครบ");
-                return;
-            }
+<script src="js/main.js"></script>
+<script>
+async function handleLogin() {
+    const u = username.value.trim();
+    const p = password.value.trim();
 
-            toggleLoader(true);
+    if (!u || !p) {
+        showPopup("กรุณากรอกข้อมูลให้ครบ");
+        return;
+    }
 
-            try {
-                const res = await apiRequest({
-                    action: 'loginIT',
-                    email: u,
-                    password: p
-                });
+    toggleLoader(true);
 
-                if (res && res.success) {
-                    // ✅ ใช้ key เดียวกับ index.html
-                    localStorage.setItem('it_session', JSON.stringify(res));
-                    window.location.replace('index.html');
-                } else {
-                    alert("❌ Email หรือ Password ไม่ถูกต้อง");
-                }
+    try {
+        const res = await apiRequest({
+            action: 'loginIT',
+            email: u,
+            password: p
+        });
 
-            } catch (err) {
-                alert("❌ ไม่สามารถเชื่อมต่อระบบได้");
-                console.error(err);
-            } finally {
-                toggleLoader(false);
-            }
+        if (res.success) {
+            showPopup("เข้าสู่ระบบสำเร็จ", "สำเร็จ");
+            localStorage.setItem('it_session', JSON.stringify(res));
+            setTimeout(() => location.href = "index.html", 800);
+        } else {
+            showPopup("Email หรือ Password ไม่ถูกต้อง", "ไม่ผ่าน");
         }
-    </script>
+
+    } catch (e) {
+        showPopup("ไม่สามารถเชื่อมต่อระบบได้", "ข้อผิดพลาด");
+    } finally {
+        toggleLoader(false);
+    }
+}
+</script>
 </body>
 </html>
