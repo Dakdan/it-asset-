@@ -2,17 +2,18 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
+  <title>ลงทะเบียน</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ลงทะเบียนผู้ใช้</title>
-
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
 
-<div id="loader" class="loader-overlay" style="display:none;"></div>
+<div id="loader" class="loader-overlay">
+  <div class="spinner"></div>
+</div>
 
-<div id="popup" class="popup-overlay" style="display:none;">
+<div id="popup" class="popup-overlay">
   <div class="popup-box">
     <h3 id="popup-title">แจ้งเตือน</h3>
     <p id="popup-message"></p>
@@ -21,37 +22,35 @@
 </div>
 
 <div class="login-wrapper">
-  <div class="login-card">
-    <div class="card-title">📝 ลงทะเบียน</div>
 
-    <form onsubmit="handleRegister(); return false;">
-      <div class="form-group">
-        <label class="sr-only" for="USERID">User ID</label>
-        <input id="USERID" name="USERID" required autocomplete="username">
-      </div>
-
-      <div class="form-group">
-        <label class="sr-only" for="UserName">ชื่อ</label>
-        <input id="UserName" name="UserName" required>
-      </div>
-
-      <div class="form-group">
-        <label class="sr-only" for="UserSname">นามสกุล</label>
-        <input id="UserSname" name="UserSname">
-      </div>
-
-      <div class="form-group">
-        <label class="sr-only" for="UserMail">Email</label>
-        <input id="UserMail" name="UserMail" type="email" required autocomplete="email">
-      </div>
-
-      <input type="hidden" id="UserTypeName" value="เจ้าหน้าที่ IT">
-
-      <button type="submit" class="btn-login">สมัครสมาชิก</button>
-    </form>
+  <div class="login-header">
+    <h1>ลงทะเบียนผู้ใช้</h1>
   </div>
+
+  <div class="login-card">
+    <div class="form-group">
+      <input id="USERID" placeholder="User ID" autocomplete="username">
+    </div>
+
+    <div class="form-group">
+      <input id="UserName" placeholder="ชื่อ">
+    </div>
+
+    <div class="form-group">
+      <input id="UserSname" placeholder="นามสกุล">
+    </div>
+
+    <div class="form-group">
+      <input id="UserMail" placeholder="Email" type="email" autocomplete="email">
+    </div>
+
+    <input type="hidden" id="UserTypeName" value="เจ้าหน้าที่ IT">
+
+    <button class="btn-login" onclick="handleRegister()">สมัครสมาชิก</button>
+  </div>
+
 </div>
 
-<script src="js/main.js"></script>
+<script src="./js/main.js"></script>
 </body>
 </html>
