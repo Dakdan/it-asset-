@@ -1,32 +1,19 @@
 const SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbzNSgpYNigJX7W-RUPq8SLN4e687pE55p72KsbM-nWFcPefKDhjzYAflsm78i42IW7qrw/exec";
 
-/* ===============================
-   Helper : เรียก Google Apps Script
-================================ */
-async function apiRequest(data) {
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    });
+/* ======================
+   UTIL
+====================== */
 
-    return await res.json();
-  } catch (err) {
-    console.error(err);
-    throw new Error("Failed to fetch");
-  }
+function showLoader(show = true) {
+  const el = document.getElementById("loader");
+  if (!el) return;
+  el.style.display = show ? "flex" : "none";
 }
 
-/* ===============================
-   Popup
-================================ */
-function showPopup(title, message) {
+function showPopup(msg, title = "แจ้งเตือน") {
   document.getElementById("popup-title").innerText = title;
-  document.getElementById("popup-message").innerText = message;
+  document.getElementById("popup-message").innerText = msg;
   document.getElementById("popup").style.display = "flex";
 }
 
@@ -34,25 +21,38 @@ function closePopup() {
   document.getElementById("popup").style.display = "none";
 }
 
-/* ===============================
-   Loader
-================================ */
-function showLoader(show) {
-  document.getElementById("loader").style.display = show ? "flex" : "none";
+/* ======================
+   API
+====================== */
+
+async function apiRequest(data) {
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      throw new Error("HTTP ERROR");
+    }
+
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+    throw new Error("ไม่สามารถเชื่อมต่อระบบได้");
+  }
 }
 
-/* ===============================
-   Register
-================================ */
-async function handleRegister() {
-  const USERID = document.getElementById("USERID").value.trim();
-  const UserName = document.getElementById("UserName").value.trim();
-  const UserSname = document.getElementById("UserSname").value.trim();
-  const UserMail = document.getElementById("UserMail").value.trim();
-  const UserTypeName = document.getElementById("UserTypeName").value;
+/* ======================
+   LOGIN
+====================== */
 
-  if (!USERID || !UserName || !UserSname || !UserMail) {
-    showPopup("แจ้งเตือน", "กรุณากรอกข้อมูลให้ครบ");
+async function handleLogin() {
+  const userid = document.getElementById("USERID")?.value.trim();
+
+  if (!userid) {
+    showPopup("กรุณากรอก User ID");
     return;
   }
 
@@ -60,24 +60,74 @@ async function handleRegister() {
 
   try {
     const result = await apiRequest({
-      action: "register",
-      USERID,
-      UserName,
-      UserSname,
-      UserMail,
-      UserTypeName
+      action: "login",
+      USERID: userid,
     });
 
+    if (result.status === "success") {
+      localStorage.setItem("USER", JSON.stringify(result.data));
+      window.location.href = "index.html";
+    } else {
+      showPopup(result.message || "ไม่พบผู้ใช้งาน");
+    }
+  } catch (err) {
+    showPopup(err.message);
+  } finally {
     showLoader(false);
+  }
+}
+
+/* ======================
+   REGISTER
+====================== */
+
+async function handleRegister() {
+  const data = {
+    action: "register",
+    USERID: document.getElementById("USERID").value.trim(),
+    UserName: document.getElementById("UserName").value.trim(),
+    UserSname: document.getElementById("UserSname").value.trim(),
+    UserMail: document.getElementById("UserMail").value.trim(),
+    UserTypeName: document.getElementById("UserTypeName").value,
+  };
+
+  if (!data.USERID || !data.UserName || !data.UserMail) {
+    showPopup("กรุณากรอกข้อมูลให้ครบ");
+    return;
+  }
+
+  showLoader(true);
+
+  try {
+    const result = await apiRequest(data);
 
     if (result.status === "success") {
-      showPopup("สำเร็จ", "ลงทะเบียนเรียบร้อยแล้ว");
+      showPopup("สมัครสมาชิกสำเร็จ", "สำเร็จ");
+      setTimeout(() => {
+        window.location.href = "login.html";
+      }, 1500);
     } else {
-      showPopup("ผิดพลาด", result.message || "ไม่สามารถลงทะเบียนได้");
+      showPopup(result.message || "ไม่สามารถสมัครได้");
     }
-
   } catch (err) {
+    showPopup(err.message);
+  } finally {
     showLoader(false);
-    showPopup("ผิดพลาด", "ไม่สามารถเชื่อมต่อระบบได้");
   }
+}
+
+/* ======================
+   CHECK LOGIN (INDEX)
+====================== */
+
+function checkLogin() {
+  const user = localStorage.getItem("USER");
+  if (!user) {
+    window.location.href = "login.html";
+  }
+}
+
+function logout() {
+  localStorage.removeItem("USER");
+  window.location.href = "login.html";
 }
