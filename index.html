@@ -1,39 +1,35 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT Service - ระบบจำการเข้าใช้งาน</title>
-    <script>
-        // เช็คทันทีที่เปิดหน้าเว็บ ถ้าไม่มี Session ให้ไปหน้า Login
-        if (!localStorage.getItem('it_session')) {
-            window.location.replace('login.html');
-        }
-    </script>
-    <link rel="stylesheet" href="style.css?v=1.2">
+  <meta charset="UTF-8">
+  <title>IT Maintenance</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="./style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
+
 <body>
-    <div id="loader" class="loader-overlay"><div class="spinner"></div></div>
 
-    <nav>
-        <div class="nav-container">
-            <span id="userNameDisplay" style="color:var(--primary-pink); font-weight:500;"></span>
-            <button onclick="logout()" class="btn-logout" style="border:1px solid var(--primary-pink); border-radius:10px; padding:5px 10px; cursor:pointer;">ออกจากระบบ</button>
-        </div>
-    </nav>
+<div class="login-header">
+  <img src="./โรงพยาบาลอุดรธานี.png" class="header-logo">
+  <h1>ระบบ IT Maintenance</h1>
+</div>
 
-    <div class="login-wrapper">
-        <div class="login-card" style="border-top: 2px solid #000;">
-            <h2>ยินดีต้อนรับสู่ระบบ IT</h2>
-            <p>คุณไม่ต้อง Login ใหม่จนกว่าจะกด Logout ครับ</p>
-        </div>
-    </div>
+<div class="container">
+  <h2>ยินดีต้อนรับ</h2>
+  <button onclick="logout()" class="btn-login">ออกจากระบบ</button>
+</div>
 
-    <script src="js/main.js"></script>
-    <script>
-        // แสดงชื่อผู้ใช้จากข้อมูลที่จำไว้
-        const user = JSON.parse(localStorage.getItem('it_session'));
-        if(user) document.getElementById('userNameDisplay').innerText = "ผู้ใช้: " + user.name;
-    </script>
+<script src="./js/api.js"></script>
+<script src="./js/main.js"></script>
+
+<script>
+function logout() {
+  localStorage.removeItem('it_session');
+  location.href = "./login.html";
+}
+</script>
+
 </body>
 </html>
