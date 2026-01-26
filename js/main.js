@@ -15,18 +15,16 @@ async function apiRequest(data) {
 // ================= UI : LOADER =================
 function toggleLoader(show) {
   const el = document.getElementById("loader");
-  if (!el) return;
-  el.style.display = show ? "flex" : "none";
+  if (el) el.style.display = show ? "flex" : "none";
 }
 
 // ================= UI : POPUP =================
 function showPopup(msg, title = "แจ้งเตือน") {
   const popup = document.getElementById("popup");
   if (!popup) {
-    alert(msg); // fallback กรณี popup ยังไม่ถูกใส่
+    alert(msg);
     return;
   }
-
   document.getElementById("popup-title").innerText = title;
   document.getElementById("popup-message").innerText = msg;
   popup.style.display = "flex";
@@ -51,9 +49,9 @@ async function handleLogin() {
 
   try {
     const res = await apiRequest({
-      action: "login",        // 🔒 ตรง Code.gs
-      username: username,     // 🔒 ตรง Code.gs
-      password: password      // 🔒 ตรง Code.gs
+      action: "login",      // ✅ ตรง Code.gs
+      USERID: username,     // ✅ ชื่อตรง column
+      UserPW: password      // ✅ ชื่อตรง column
     });
 
     if (res.success) {
@@ -62,7 +60,7 @@ async function handleLogin() {
     } else {
       showPopup(res.message || "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
     }
-  } catch (err) {
+  } catch {
     showPopup("ไม่สามารถเชื่อมต่อระบบได้");
   } finally {
     toggleLoader(false);
@@ -96,7 +94,7 @@ async function handleRegister() {
     } else {
       showPopup(res.message || "ลงทะเบียนไม่สำเร็จ");
     }
-  } catch (err) {
+  } catch {
     showPopup("ไม่สามารถเชื่อมต่อระบบได้");
   } finally {
     toggleLoader(false);
