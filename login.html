@@ -2,10 +2,10 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>เข้าสู่ระบบ - IT Maintenance</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เข้าสู่ระบบ - IT Maintenance</title>
 
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 
@@ -24,13 +24,13 @@
   <div class="popup-box">
     <h3 id="popup-title">แจ้งเตือน</h3>
     <p id="popup-message"></p>
-    <button onclick="closePopup()" class="btn-login">ตกลง</button>
+    <button class="btn-login" onclick="closePopup()">ตกลง</button>
   </div>
 </div>
 
 <div class="login-wrapper">
   <div class="login-header">
-    <img src="./โรงพยาบาลอุดรธานี.png" class="header-logo">
+    <img src="https://img2.pic.in.th/-227e4f6f84f29f020.png" class="header-logo">
     <h1>โรงพยาบาลอุดรธานี</h1>
     <p>ระบบบริหารจัดการครุภัณฑ์คอมพิวเตอร์และบริการ</p>
   </div>
@@ -38,20 +38,40 @@
   <div class="login-card">
     <div class="card-title">🔓 เข้าสู่ระบบ</div>
 
-    <input type="text" id="username" placeholder="Email / Username">
-    <input type="password" id="password" placeholder="Password">
+    <form onsubmit="handleLogin(); return false;">
+      <div class="form-group">
+        <label for="username" class="sr-only">Email</label>
+        <input
+          id="username"
+          name="username"
+          type="text"
+          placeholder="Email"
+          autocomplete="username"
+          required>
+      </div>
 
-    <button class="btn-login" onclick="handleLogin()">🛡️ Login</button>
+      <div class="form-group">
+        <label for="password" class="sr-only">Password</label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          placeholder="Password"
+          autocomplete="current-password"
+          minlength="6"
+          required>
+      </div>
+
+      <button type="submit" class="btn-login">🛡️ Login</button>
+    </form>
 
     <div class="card-footer">
-      ยังไม่มีบัญชี? <a href="./register.html">ลงทะเบียน</a>
+      ยังไม่มีบัญชี? <a href="register.html">ลงทะเบียน</a>
     </div>
   </div>
 </div>
 
-<script src="./js/api.js"></script>
-<script src="./js/main.js"></script>
-
+<script src="js/main.js"></script>
 <script>
 async function handleLogin() {
   const u = username.value.trim();
@@ -72,14 +92,14 @@ async function handleLogin() {
     });
 
     if (res.success) {
-      showPopup("เข้าสู่ระบบสำเร็จ", "สำเร็จ");
       localStorage.setItem('it_session', JSON.stringify(res));
-      setTimeout(() => location.href = "./index.html", 800);
+      showPopup("เข้าสู่ระบบสำเร็จ", "สำเร็จ");
+      setTimeout(() => location.href = "index.html", 800);
     } else {
-      showPopup("Email หรือ Password ไม่ถูกต้อง", "ไม่ผ่าน");
+      showPopup("Email หรือ Password ไม่ถูกต้อง");
     }
   } catch {
-    showPopup("ไม่สามารถเชื่อมต่อระบบได้", "ข้อผิดพลาด");
+    showPopup("ไม่สามารถเชื่อมต่อระบบได้");
   } finally {
     toggleLoader(false);
   }
