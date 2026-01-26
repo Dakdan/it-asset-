@@ -49,9 +49,9 @@ async function handleLogin() {
 
   try {
     const res = await apiRequest({
-      action: "login",      // ✅ ตรง Code.gs
-      USERID: username,     // ✅ ชื่อตรง column
-      UserPW: password      // ✅ ชื่อตรง column
+      action: "login",
+      username: username,   // ✅ ตรงกับ code.gs
+      password: password   // ✅ ตรงกับ code.gs
     });
 
     if (res.success) {
@@ -60,7 +60,7 @@ async function handleLogin() {
     } else {
       showPopup(res.message || "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
     }
-  } catch {
+  } catch (err) {
     showPopup("ไม่สามารถเชื่อมต่อระบบได้");
   } finally {
     toggleLoader(false);
@@ -94,7 +94,7 @@ async function handleRegister() {
     } else {
       showPopup(res.message || "ลงทะเบียนไม่สำเร็จ");
     }
-  } catch {
+  } catch (err) {
     showPopup("ไม่สามารถเชื่อมต่อระบบได้");
   } finally {
     toggleLoader(false);
