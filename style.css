@@ -1,4 +1,133 @@
-/* POPUP */
+/* 1. ตั้งค่าฟอนต์และพื้นฐาน */
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Kanit', sans-serif;
+}
+
+body {
+    background-color: #fce4ec;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* 2. กรอบนอกสุด */
+.login-wrapper {
+    width: 100%;
+    max-width: 450px;
+    padding: 15px;
+}
+
+/* 3. Header */
+.login-header {
+    background: linear-gradient(180deg, #800040 0%, #ff0080 100%);
+    color: white;
+    padding: 25px;
+    text-align: center;
+    border-radius: 20px 20px 0 0;
+    border: 2px solid #000;
+}
+
+.header-logo {
+    width: 80px;
+    height: 80px;
+    background: white;
+    border-radius: 50%;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+/* 4. Card */
+.login-card {
+    background: white;
+    padding: 30px;
+    border-radius: 0 0 20px 20px;
+    border: 2px solid #000;
+    border-top: none;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* 5. Form */
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ff00ff;
+    border-radius: 12px;
+    font-size: 1rem;
+    outline: none;
+}
+
+/* 6. Button */
+.btn-login {
+    width: 100%;
+    padding: 15px;
+    background: #ff0080;
+    color: white;
+    border: 2px solid #00ff00;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.btn-back {
+    background: none;
+    border: none;
+    color: #0000ee;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-top: 15px;
+    width: 100%;
+    text-align: center;
+}
+
+/* 7. Loader */
+.loader-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #ff0080;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* =========================
+   POPUP (ADD ONLY)
+   ========================= */
 .popup-overlay {
     position: fixed;
     inset: 0;
