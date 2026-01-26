@@ -1,56 +1,32 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <title>ลงทะเบียน</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="./style.css">
+<meta charset="UTF-8">
+<title>Register</title>
+<link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<div id="loader" class="loader-overlay">
-  <div class="spinner"></div>
+<div class="card">
+  <h2>สมัครสมาชิก</h2>
+  <input id="reg_user" placeholder="Username">
+  <input id="reg_name" placeholder="ชื่อ">
+  <input id="reg_sname" placeholder="นามสกุล">
+  <input id="reg_email" placeholder="Email">
+  <button onclick="handleRegister()">สมัคร</button>
 </div>
 
-<div id="popup" class="popup-overlay">
+<div id="loader" class="loader">Loading...</div>
+
+<div id="popup" class="popup">
   <div class="popup-box">
-    <h3 id="popup-title">แจ้งเตือน</h3>
+    <h3 id="popup-title"></h3>
     <p id="popup-message"></p>
-    <button onclick="closePopup()" class="btn-login">ตกลง</button>
+    <button onclick="closePopup()">ตกลง</button>
   </div>
 </div>
 
-<div class="login-wrapper">
-
-  <div class="login-header">
-    <h1>ลงทะเบียนผู้ใช้</h1>
-  </div>
-
-  <div class="login-card">
-    <div class="form-group">
-      <input id="USERID" placeholder="User ID" autocomplete="username">
-    </div>
-
-    <div class="form-group">
-      <input id="UserName" placeholder="ชื่อ">
-    </div>
-
-    <div class="form-group">
-      <input id="UserSname" placeholder="นามสกุล">
-    </div>
-
-    <div class="form-group">
-      <input id="UserMail" placeholder="Email" type="email" autocomplete="email">
-    </div>
-
-    <input type="hidden" id="UserTypeName" value="เจ้าหน้าที่ IT">
-
-    <button class="btn-login" onclick="handleRegister()">สมัครสมาชิก</button>
-  </div>
-
-</div>
-
-<script src="./js/main.js"></script>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
 </body>
 </html>
