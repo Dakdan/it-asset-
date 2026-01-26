@@ -12,20 +12,29 @@ async function apiRequest(data) {
   return res.json();
 }
 
-// ================= UI =================
+// ================= UI : LOADER =================
 function toggleLoader(show) {
   const el = document.getElementById("loader");
-  if (el) el.style.display = show ? "flex" : "none";
+  if (!el) return;
+  el.style.display = show ? "flex" : "none";
 }
 
+// ================= UI : POPUP =================
 function showPopup(msg, title = "แจ้งเตือน") {
+  const popup = document.getElementById("popup");
+  if (!popup) {
+    alert(msg); // fallback กรณี popup ยังไม่ถูกใส่
+    return;
+  }
+
   document.getElementById("popup-title").innerText = title;
   document.getElementById("popup-message").innerText = msg;
-  document.getElementById("popup").style.display = "flex";
+  popup.style.display = "flex";
 }
 
 function closePopup() {
-  document.getElementById("popup").style.display = "none";
+  const popup = document.getElementById("popup");
+  if (popup) popup.style.display = "none";
 }
 
 // ================= LOGIN =================
@@ -42,9 +51,9 @@ async function handleLogin() {
 
   try {
     const res = await apiRequest({
-      action: "login",        // ✅ ตรงกับ Code.gs
-      USERID: username,       // ✅ ตรง column
-      UserPW: password        // ✅ ตรง column
+      action: "login",        // 🔒 ตรง Code.gs
+      username: username,     // 🔒 ตรง Code.gs
+      password: password      // 🔒 ตรง Code.gs
     });
 
     if (res.success) {
@@ -53,7 +62,7 @@ async function handleLogin() {
     } else {
       showPopup(res.message || "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
     }
-  } catch (e) {
+  } catch (err) {
     showPopup("ไม่สามารถเชื่อมต่อระบบได้");
   } finally {
     toggleLoader(false);
@@ -64,11 +73,11 @@ async function handleLogin() {
 async function handleRegister() {
   const data = {
     action: "registerIT",
-    USERID: USERID.value.trim(),
-    UserTypeName: UserTypeName.value,
-    UserName: UserName.value.trim(),
-    UserSname: UserSname.value.trim(),
-    UserMail: UserMail.value.trim()
+    USERID: document.getElementById("USERID")?.value.trim(),
+    UserTypeName: document.getElementById("UserTypeName")?.value || "IT",
+    UserName: document.getElementById("UserName")?.value.trim(),
+    UserSname: document.getElementById("UserSname")?.value.trim(),
+    UserMail: document.getElementById("UserMail")?.value.trim()
   };
 
   if (!data.USERID || !data.UserName || !data.UserMail) {
@@ -82,13 +91,13 @@ async function handleRegister() {
     const res = await apiRequest(data);
 
     if (res.success) {
-      showPopup("สมัครสมาชิกสำเร็จ กรุณาตรวจสอบ Email", "สำเร็จ");
+      showPopup("สมัครสมาชิกสำเร็จ", "สำเร็จ");
       setTimeout(() => location.href = "login.html", 1200);
     } else {
       showPopup(res.message || "ลงทะเบียนไม่สำเร็จ");
     }
-  } catch {
-    showPopup("เชื่อมต่อระบบไม่ได้");
+  } catch (err) {
+    showPopup("ไม่สามารถเชื่อมต่อระบบได้");
   } finally {
     toggleLoader(false);
   }
