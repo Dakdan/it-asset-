@@ -11,7 +11,7 @@
 
 <body>
 
-<div class="login-wrapper">
+
 
   <!-- HEADER (ใช้ของเดิม) -->
   <div class="login-header">
@@ -33,7 +33,12 @@
 
 <script src="./js/api.js"></script>
 <script src="./js/main.js"></script>
-
+<script>
+const session = localStorage.getItem("it_session");
+if(!session){
+  location.href = "./login.html";
+}
+</script>
 <script>
 function logout() {
   localStorage.removeItem('it_session');
