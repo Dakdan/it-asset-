@@ -1,60 +1,30 @@
-// ================= CONFIG =================
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNSgpYNigJX7W-RUPq8SLN4e687pE55p72KsbM-nWFcPefKDhjzYAflsm78i42IW7qrw/exec";
+// ================= LOGIN =================
+async function handleLogin() {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
 
-// ================= API =================
-async function apiRequest(data) {
-  const res = await fetch(SCRIPT_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
-  return await res.json();
-}
-
-// ================= UI =================
-function toggleLoader(show) {
-  const loader = document.getElementById("loader");
-  if (loader) loader.style.display = show ? "flex" : "none";
-}
-
-function showPopup(msg, title = "แจ้งเตือน") {
-  document.getElementById("popup-title").innerText = title;
-  document.getElementById("popup-message").innerText = msg;
-  document.getElementById("popup").style.display = "flex";
-}
-
-function closePopup() {
-  document.getElementById("popup").style.display = "none";
-}
-
-// ================= REGISTER =================
-async function handleRegister() {
-  const data = {
-    action: 'registerIT',
-    USERID: USERID.value.trim(),
-    UserTypeName: UserTypeName.value,
-    UserName: UserName.value.trim(),
-    UserSname: UserSname.value.trim(),
-    UserMail: UserMail.value.trim()
-  };
-
-  if (!data.USERID || !data.UserMail || !data.UserName) {
-    showPopup("กรุณากรอกข้อมูลให้ครบ");
+  if (!username || !password) {
+    showPopup("กรุณากรอก Username และ Password");
     return;
   }
 
   toggleLoader(true);
 
   try {
-    const res = await apiRequest(data);
+    const res = await apiRequest({
+      action: "login",
+      username: username,
+      password: password
+    });
+
     if (res.success) {
-      showPopup("ลงทะเบียนสำเร็จ กรุณาตรวจสอบ Email", "สำเร็จ");
-      setTimeout(() => location.href = "login.html", 1200);
+      localStorage.setItem("it_session", JSON.stringify(res.data));
+      location.href = "index.html";
     } else {
-      showPopup(res.message || "ลงทะเบียนไม่สำเร็จ");
+      showPopup(res.message || "เข้าสู่ระบบไม่สำเร็จ");
     }
-  } catch {
-    showPopup("การเชื่อมต่อล้มเหลว");
+  } catch (err) {
+    showPopup("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
   } finally {
     toggleLoader(false);
   }
