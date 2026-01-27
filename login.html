@@ -1,74 +1,112 @@
 <!DOCTYPE html>
-<html lang="th">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>เข้าสู่ระบบ - IT Maintenance</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>IT UDH Maintenance & Service</title>
 
-  <link rel="stylesheet" href="/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:linear-gradient(135deg,#ff5fa2,#ffd1e6);
+}
+.container{
+  max-width:420px;
+  margin:40px auto;
+  background:#fff;
+  border-radius:20px;
+  padding:20px;
+  border:3px solid #ff5fa2;
+}
+h1{
+  text-align:center;
+  color:#ff2f92;
+}
+.input{
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border-radius:10px;
+  border:1px solid #ff5fa2;
+  font-size:16px;
+}
+button{
+  width:100%;
+  padding:14px;
+  background:#ff2f92;
+  color:#fff;
+  border:none;
+  border-radius:14px;
+  font-size:18px;
+}
+button:hover{opacity:0.9;}
+</style>
 </head>
 
-<body class="login-page">
+<body>
+<div class="container">
+  <h1>🖥️ IT SERVICE DESK</h1>
 
-<!-- ================= LOADER ================= -->
-<div id="loader" class="loader-overlay" style="display:none;">
-  <div class="spinner"></div>
+  <select id="jobType" class="input">
+    <option value="">เลือกประเภทงาน</option>
+  </select>
+
+  <select id="jobSubType" class="input">
+    <option value="">เลือกงานย่อย</option>
+  </select>
+
+  <textarea id="detail" class="input" placeholder="รายละเอียดงาน / อาการปัญหา"></textarea>
+  <input id="phone" class="input" placeholder="เบอร์ติดต่อกลับ">
+  <input id="reporter" class="input" placeholder="ผู้แจ้ง">
+
+  <button onclick="submitJob()">🔒 บันทึกแจ้งงาน</button>
 </div>
-
-<!-- ================= POPUP ================= -->
-<div id="popup" class="popup-overlay" style="display:none;">
-  <div class="popup-box">
-    <h3 id="popup-title">แจ้งเตือน</h3>
-    <p id="popup-message"></p>
-    <button onclick="closePopup()" class="btn-login">ตกลง</button>
-  </div>
-</div>
-
-<div class="login-wrapper">
-
-  <!-- ================= HEADER ================= -->
-  <div class="login-header">
-    <img src="./โรงพยาบาลอุดรธานี.png" class="header-logo">
-    <h1>โรงพยาบาลอุดรธานี</h1>
-    <p>ระบบบริหารจัดการครุภัณฑ์คอมพิวเตอร์และบริการ</p>
-  </div>
-
-  <!-- ================= LOGIN CARD ================= -->
-  <div class="login-card">
-
-    <div class="form-group">
-      <label>👤 Email / Username</label>
-      <input type="text" id="username" autocomplete="username">
-    </div>
-
-    <div class="form-group">
-      <label>🔒 Password</label>
-      <input type="password" id="password" autocomplete="current-password">
-    </div>
-
-    <button class="btn-login" onclick="handleLogin()">
-      🛡️ Login
-    </button>
-
-    <div class="card-footer" style="text-align:center; margin-top:15px;">
-      ยังไม่มีบัญชี? <a href="register.html">ลงทะเบียน</a>
-    </div>
-
-  </div>
-</div>
-
-<!-- ================= SCRIPT ================= -->
-<script src="./js/api.js"></script>
-<script src="./js/main.js"></script>
 
 <script>
-  // ===== auto login ถ้ามี session =====
-  const session = localStorage.getItem("it_session");
-  if (session) {
-    location.href = "./index.html";
-  }
-</script>
+function loadJobTypes(){
+  google.script.run.withSuccessHandler(data=>{
+    const sel=document.getElementById("jobType");
+    data.forEach(d=>{
+      const o=document.createElement("option");
+      o.value=d.code;
+      o.text=d.name;
+      sel.appendChild(o);
+    });
+  }).getJobTypes();
+}
 
+document.getElementById("jobType").onchange=function(){
+  const code=this.value;
+  const sub=document.getElementById("jobSubType");
+  sub.innerHTML='<option value="">เลือกงานย่อย</option>';
+  if(!code) return;
+
+  google.script.run.withSuccessHandler(data=>{
+    data.forEach(d=>{
+      const o=document.createElement("option");
+      o.value=d.code;
+      o.text=d.name;
+      sub.appendChild(o);
+    });
+  }).getJobSubTypes(code);
+};
+
+function submitJob(){
+  const form={
+    jobType:jobType.value,
+    jobSubType:jobSubType.value,
+    detail:detail.value,
+    phone:phone.value,
+    reporter:reporter.value
+  };
+
+  google.script.run.withSuccessHandler(id=>{
+    alert("บันทึกสำเร็จ เลขที่งาน: "+id);
+    location.reload();
+  }).saveJob(form);
+}
+
+loadJobTypes();
+</script>
 </body>
 </html>
